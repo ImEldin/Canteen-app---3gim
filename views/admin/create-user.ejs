@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create User</title>
+</head>
+<body>
+<h1>Create New User</h1>
+
+<% if (error) { %>
+    <p style="color:red;"><%= error %></p>
+<% } %>
+
+<% if (tempPassword) { %>
+    <p style="color:green;">User created successfully! Temporary password: <strong><%= tempPassword %></strong></p>
+<% } %>
+
+<form action="/admin/create-user" method="POST">
+    <label>Email:</label>
+    <input type="email" name="email" required><br><br>
+
+    <label>Username:</label>
+    <input type="text" name="username" required><br><br>
+
+    <label>Role:</label>
+    <select name="role" required>
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+        <option value="kantina">Kantina</option>
+        <option value="profesor">Profesor</option>
+    </select><br><br>
+
+    <button type="submit">Create User</button>
+</form>
+</body>
+</html>

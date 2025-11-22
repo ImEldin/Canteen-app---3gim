@@ -1,0 +1,56 @@
+const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+const userRepository = require('../repositories/userRepository');
+
+function generateTempPassword() {
+    return crypto.randomBytes(4).toString('base64')
+        .replace(/\+/g,'A')
+        .replace(/\//g,'B')
+        .slice(0,6);
+}
+
+module.exports = {
+
+    async getAllUsers(excludeUserId) {
+        return await userRepository.getAllUsers(excludeUserId);
+    },
+
+    async createUser({ email, username, role}) {
+        const existing = await userRepository.findByEmail(email);
+        if (existing) {
+            return { success: false, message: 'Email already exists' };
+        }
+
+        const tempPassword = generateTempPassword();
+        const hashed = await bcrypt.hash(tempPassword, 10);
+
+        const user = await userRepository.createUser({
+            email,
+            username,
+            password: hashed,
+            role,
+        });
+
+        return { success: true, user, tempPassword };
+    },
+
+    async lockUser(userId, minutes) {
+        const lockedUntil = new Date(Date.now() + minutes*60000);
+        await userRepository.updateUser(userId, { is_locked: true, locked_until: lockedUntil });
+    },
+
+    async unlockUser(userId) {
+        await userRepository.updateUser(userId, { is_locked: false, locked_until: null, failed_login_attempts: 0 });
+    },
+
+    async resetPassword(userId) {
+        const tempPassword = generateTempPassword();
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+        await userRepository.updateUser(userId, { password: hashedPassword, must_change_password: true });
+        return { tempPassword };
+    },
+
+    async deleteUser(userId) {
+        await userRepository.deleteUser(userId);
+    }
+};
