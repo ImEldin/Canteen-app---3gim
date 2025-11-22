@@ -12,6 +12,8 @@ router.get('/manage-users', adminController.listUsers);
 router.get('/create-user', adminController.showCreateUserForm);
 router.post('/create-user', adminController.handleCreateUser);
 
+router.get("/user/:id", adminController.userDetails);
+
 router.post('/lock/:id', adminController.lockUser);
 router.post('/unlock/:id', adminController.unlockUser);
 router.post('/reset-password/:id', adminController.resetPassword);

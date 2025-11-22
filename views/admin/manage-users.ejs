@@ -1,27 +1,22 @@
 <h1>Users</h1>
-<a href="/admin/create-user">Add User</a>
+
 <table border="1">
-    <tr><th>Email</th><th>Username</th><th>Role</th><th>Actions</th></tr>
+    <tr>
+        <th>Email</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Actions</th>
+    </tr>
+
     <% users.forEach(user => { %>
         <tr>
             <td><%= user.email %></td>
             <td><%= user.username %></td>
             <td><%= user.role %></td>
             <td>
-                <form style="display:inline" method="POST" action="/admin/lock/<%= user.id %>">
-                    <input type="number" name="minutes" placeholder="Minutes" required>
-                    <button type="submit">Lock</button>
-                </form>
-                <form style="display:inline" method="POST" action="/admin/unlock/<%= user.id %>">
-                    <button type="submit">Unlock</button>
-                </form>
-                <form style="display:inline" method="POST" action="/admin/reset-password/<%= user.id %>">
-                    <button type="submit">Reset Password</button>
-                </form>
-                <form style="display:inline" method="POST" action="/admin/delete/<%= user.id %>">
-                    <button type="submit">Delete</button>
-                </form>
+                <a href="/admin/user/<%= user.id %>">View</a>
             </td>
         </tr>
     <% }) %>
 </table>
+<a href="/admin">Back</a>

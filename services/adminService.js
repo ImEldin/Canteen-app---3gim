@@ -15,7 +15,11 @@ module.exports = {
         return await userRepository.getAllUsers(excludeUserId);
     },
 
-    async createUser({ email, username, role}) {
+    async getUserDetails(userId) {
+        return await userRepository.findById(userId);
+    },
+
+    async createUser({ email, username, role, phone_number}) {
         const existing = await userRepository.findByEmail(email);
         if (existing) {
             return { success: false, message: 'Email already exists' };
@@ -27,6 +31,7 @@ module.exports = {
         const user = await userRepository.createUser({
             email,
             username,
+            phone_number,
             password: hashed,
             role,
         });

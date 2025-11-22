@@ -1,0 +1,46 @@
+<h1>User Details</h1>
+
+<h2>General Info</h2>
+<p>Email: <%= user.email %></p>
+<p>Username: <%= user.username %></p>
+<p>Phone: <%= user.phone_number %></p>
+<p>Role: <%= user.role %></p>
+
+<h2>Security Info</h2>
+<p>Active: <%= user.is_active %></p>
+<p>Locked: <%= user.is_locked %></p>
+<p>Failed Attempts: <%= user.failed_login_attempts %></p>
+<p>Locked Until: <%= user.locked_until %></p>
+<p>Must Change Password: <%= user.must_change_password %></p>
+<p>Last Login: <%= user.last_login_at %></p>
+
+<h2>Password Reset</h2>
+<p>Reset Token: <%= user.password_reset_token %></p>
+<p>Expires At: <%= user.password_reset_expires_at %></p>
+
+<h2>Timestamps</h2>
+<p>Created: <%= user.created_at %></p>
+<p>Updated: <%= user.updated_at %></p>
+
+<hr>
+
+<h2>Actions</h2>
+
+<form method="POST" action="/admin/lock/<%= user.id %>">
+    <input name="minutes" type="number" required>
+    <button>Lock</button>
+</form>
+
+<form method="POST" action="/admin/unlock/<%= user.id %>">
+    <button>Unlock</button>
+</form>
+
+<form method="POST" action="/admin/reset-password/<%= user.id %>">
+    <button>Reset Password</button>
+</form>
+
+<form method="POST" action="/admin/delete/<%= user.id %>">
+    <button>Delete User</button>
+</form>
+
+<a href="/admin/manage-users">Back</a>

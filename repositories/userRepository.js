@@ -25,10 +25,11 @@ module.exports = {
         );
     },
 
-    createUser({ email, username, password, role }) {
+    createUser({ email, username, password, role, phone_number }) {
         return User.create({
             email,
             username,
+            phone_number,
             password,
             role
         });

@@ -10,15 +10,24 @@ module.exports = {
         res.render('admin/manage-users', { users });
     },
 
+    async userDetails(req, res) {
+        const id = req.params.id;
+
+        const user = await adminService.getUserDetails(id);
+        if (!user) return res.status(404).send("User not found");
+
+        res.render("admin/user-details", { user });
+    },
+
     showCreateUserForm(req, res) {
         res.render('admin/create-user', { error: null, tempPassword: null });
     },
 
     async handleCreateUser(req, res) {
-        const { email, username, role } = req.body;
+        const { email, username, role, phone_number } = req.body;
 
         try {
-            const result = await adminService.createUser({ email, username, role });
+            const result = await adminService.createUser({ email, username, role, phone_number});
 
             if (!result.success) {
                 return res.render('admin/create-user', { error: result.message, tempPassword: null });
