@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const userRepository = require('../repositories/userRepository');
+const { Op } = require('sequelize');
 
 function generateTempPassword() {
     return crypto.randomBytes(4).toString('base64')
@@ -11,8 +12,38 @@ function generateTempPassword() {
 
 module.exports = {
 
-    async getAllUsers(excludeUserId) {
-        return await userRepository.getAllUsers(excludeUserId);
+    async getAllUsers({page, pageSize, filters, excludeUserId}) {
+
+        const where = {};
+
+        if (filters.email) {
+            where.email = { [Op.iLike]: `%${filters.email}%` };
+        }
+
+        if (filters.username) {
+            where.username = { [Op.iLike]: `%${filters.username}%` };
+        }
+
+        if (filters.role) {
+            where.role = filters.role;
+        }
+
+        where.id = { [Op.ne]: excludeUserId };
+
+        const offset = (page - 1) * pageSize;
+
+        const result = await userRepository.getAllUsers({
+            where,
+            offset,
+            limit: pageSize + 1
+        });
+
+        const hasMore = result.length > pageSize;
+
+        return {
+            users: result.slice(0, pageSize),
+            hasMore
+        };
     },
 
     async getUserDetails(userId) {

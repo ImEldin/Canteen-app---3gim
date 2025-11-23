@@ -14,8 +14,6 @@ module.exports = (sequelize, DataTypes) => {
             is_locked: { type: DataTypes.BOOLEAN, defaultValue: false },
             failed_login_attempts: { type: DataTypes.INTEGER, defaultValue: 0 },
             locked_until: DataTypes.DATE,
-            password_reset_token: DataTypes.STRING,
-            password_reset_expires_at: DataTypes.DATE,
             created_at: DataTypes.DATE,
             updated_at: DataTypes.DATE,
             last_login_at: DataTypes.DATE

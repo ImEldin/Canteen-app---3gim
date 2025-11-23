@@ -6,8 +6,34 @@ module.exports = {
     },
 
     async listUsers(req, res) {
-        const users = await adminService.getAllUsers(req.session.user.id);
-        res.render('admin/manage-users', { users });
+
+        const adminId = req.session.user.id;
+
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 20;
+
+        const filters = {
+            email: req.query.email || "",
+            role: req.query.role || "",
+            username: req.query.username || ""
+        };
+
+        const { users, hasMore } = await adminService.getAllUsers(
+            {
+                page,
+                pageSize,
+                filters,
+                excludeUserId: adminId
+            }
+        );
+
+        res.render('admin/manage-users', {
+            users,
+            filters,
+            page,
+            pageSize,
+            hasMore
+        });
     },
 
     async userDetails(req, res) {

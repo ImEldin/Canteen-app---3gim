@@ -1,12 +1,13 @@
 const { User } = require('../models');
-const { Op } = require('sequelize');
 
 module.exports = {
-    getAllUsers(excludeUserId) {
-        const where = excludeUserId ? { id: { [Op.ne]: excludeUserId } } : {};
+    getAllUsers({ where, offset, limit }) {
+
         return User.findAll({
             where,
-            order: [['email', 'ASC']]
+            order: [['email', 'ASC']],
+            offset,
+            limit
         });
     },
 

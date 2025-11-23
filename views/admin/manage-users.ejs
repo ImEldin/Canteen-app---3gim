@@ -1,22 +1,56 @@
 <h1>Users</h1>
 
-<table border="1">
-    <tr>
-        <th>Email</th>
-        <th>Username</th>
-        <th>Role</th>
-        <th>Actions</th>
-    </tr>
+<form id="filterForm" method="GET" action="/admin/manage-users">
+    <input type="text" name="email" placeholder="Email" value="<%= filters.email %>">
+    <input type="text" name="username" placeholder="Username" value="<%= filters.username %>">
 
+    <select name="role">
+        <option value="">Any role</option>
+        <option value="user" <%= filters.role === 'user' ? 'selected' : '' %>>User</option>
+        <option value="profesor" <%= filters.role === 'profesor' ? 'selected' : '' %>>Profesor</option>
+        <option value="kantina" <%= filters.role === 'kantina' ? 'selected' : '' %>>Kantina</option>
+        <option value="admin" <%= filters.role === 'admin' ? 'selected' : '' %>>Admin</option>
+    </select>
+
+    <select name="pageSize">
+        <option value="5" <%= pageSize == 5 ? 'selected' : '' %>>5</option>
+        <option value="10" <%= pageSize == 10 ? 'selected' : '' %>>10</option>
+        <option value="20" <%= pageSize == 20 ? 'selected' : '' %>>20</option>
+        <option value="50" <%= pageSize == 50 ? 'selected' : '' %>>50</option>
+    </select>
+
+    <button type="submit">Filter</button>
+    <button type="button" onclick="window.location='/admin/manage-users'">Clear</button>
+</form>
+
+<ul id="userList">
     <% users.forEach(user => { %>
-        <tr>
-            <td><%= user.email %></td>
-            <td><%= user.username %></td>
-            <td><%= user.role %></td>
-            <td>
-                <a href="/admin/user/<%= user.id %>">View</a>
-            </td>
-        </tr>
+        <li>
+            <strong><%= user.username %></strong>
+            ( <%= user.email %> ) -
+            <%= user.role %>
+
+            <a href="/admin/user/<%= user.id %>">View</a>
+        </li>
     <% }) %>
-</table>
+</ul>
+
+<div>
+    <% if (page > 1) { %>
+        <a href="?page=<%= page - 1 %>&pageSize=<%= pageSize %>&email=<%= filters.email %>&username=<%= filters.username %>&role=<%= filters.role %>">
+            Previous
+        </a>
+    <% } %>
+
+    <span>Page <%= page %></span>
+
+    <% if (hasMore) { %>
+        <a href="?page=<%= page + 1 %>&pageSize=<%= pageSize %>&email=<%= filters.email %>&username=<%= filters.username %>&role=<%= filters.role %>">
+            Next
+        </a>
+    <% } %>
+</div>
+
 <a href="/admin">Back</a>
+<a href="/admin/create-user">Create New User</a>
+
