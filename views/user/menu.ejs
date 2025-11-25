@@ -1,0 +1,78 @@
+<h1>Menu</h1>
+
+<div>
+    <h2>Items</h2>
+
+    <ul>
+        <% menu.forEach(item => { %>
+            <li>
+                <strong><%= item.name %></strong> - <%= item.price %> KM
+                <a href="/user/menu/add/<%= item.id %>">Add</a>
+            </li>
+        <% }) %>
+    </ul>
+</div>
+
+<hr>
+
+<div>
+    <h2>Your Cart</h2>
+
+    <% if (cart.length === 0) { %>
+        <p>Cart is empty</p>
+    <% } else { %>
+        <ul>
+            <% cart.forEach(c => { %>
+                <li>
+                    <%= c.name %> — <%= c.quantity %> × <%= c.price %> KM
+                    <a href="/user/menu/remove/<%= c.id %>">Remove</a>
+                </li>
+            <% }) %>
+        </ul>
+
+        <h3>Total: <%= total.toFixed(2) %> KM</h3>
+
+        <form action="/user/menu/confirm" method="POST">
+            <h3>Pickup Option</h3>
+
+            <label>
+                <input type="radio" name="pickupMode" value="break" onclick="enableBreak()">
+                Choose Big Break
+            </label>
+
+            <select name="break_slot" id="break_slot" disabled>
+                <option value="">-- Select break --</option>
+                <option value="first_break">First Break</option>
+                <option value="second_break">Second Break</option>
+            </select>
+
+            <label>
+                <input type="radio" name="pickupMode" value="time" onclick="enableTime()">
+                Choose Specific Time
+            </label>
+
+            <input type="time" name="pickup_time" id="pickup_time" min="09:00" max="15:00" disabled>
+
+            <button type="submit">Confirm Order</button>
+        </form>
+    <% } %>
+</div>
+
+<hr>
+
+<a href="/user/orders">View My Orders</a> |
+<a href="/user">Back</a>
+
+<script>
+    function enableBreak() {
+        document.getElementById("break_slot").disabled = false;
+        document.getElementById("pickup_time").disabled = true;
+        document.getElementById("pickup_time").value = "";
+    }
+
+    function enableTime() {
+        document.getElementById("pickup_time").disabled = false;
+        document.getElementById("break_slot").disabled = true;
+        document.getElementById("break_slot").value = "";
+    }
+</script>

@@ -17,6 +17,7 @@ module.exports = {
         req.session.user = {
             id: result.user.id,
             email: result.user.email,
+            username: result.user.username,
             role: result.user.role,
             must_change_password: result.user.must_change_password
         };
@@ -27,6 +28,10 @@ module.exports = {
 
         if (result.user.role === 'admin') {
             return res.redirect('/admin');
+        }
+
+        if(result.user.role === 'user'){
+            return res.redirect('/user');
         }
 
         return res.redirect('/dashboard');

@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
             user_id: { type: DataTypes.INTEGER, allowNull: false },
             total_amount: { type: DataTypes.DECIMAL(12,2), defaultValue: 0 },
-            pickup_time: DataTypes.DATE,
+            pickup_time: DataTypes.TIME,
             break_slot: DataTypes.TEXT,
             created_at: DataTypes.DATE,
             updated_at: DataTypes.DATE

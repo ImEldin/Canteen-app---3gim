@@ -6,7 +6,6 @@ module.exports = (sequelize, DataTypes) => {
             id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
             order_id: { type: DataTypes.INTEGER, allowNull: false },
             menu_item_id: DataTypes.INTEGER,
-            name: { type: DataTypes.TEXT, allowNull: false },
             unit_price: { type: DataTypes.DECIMAL(10,2), defaultValue: 0 },
             quantity: { type: DataTypes.INTEGER, defaultValue: 1 },
             total_price: { type: DataTypes.DECIMAL(12,2), defaultValue: 0 },

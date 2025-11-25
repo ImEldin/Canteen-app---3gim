@@ -5,8 +5,6 @@ module.exports = (sequelize, DataTypes) => {
         {
             id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
             name: { type: DataTypes.TEXT, allowNull: false, unique: true },
-            dedscription: DataTypes.TEXT,
-            created_at: DataTypes.DATE,
         },
         {
             tableName: "tags",
