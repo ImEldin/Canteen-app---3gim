@@ -4,7 +4,24 @@ const e = require("express");
 
 module.exports = {
     async showMenu(req, res) {
-        const menu = await menuService.getMenuItems();
+
+        let order = req.query.order;
+        let orderBy = null;
+
+        if(order === "price_asc"){
+            orderBy = [["price", "ASC"]];
+        }
+        else if(order === "price_desc"){
+            orderBy = [["price", "DESC"]];
+        }
+
+        const filters = {
+            tag: req.query.tag || "",
+            name: req.query.name || "",
+            orderBy: orderBy
+        };
+
+        const [menu, tags] = await menuService.getMenuItems(filters);
 
         if (!req.session.cart) req.session.cart = [];
 
@@ -13,7 +30,9 @@ module.exports = {
         res.render("user/menu", {
             menu,
             cart: req.session.cart,
-            total: total
+            total: total,
+            filters,
+            tags
         });
     },
 

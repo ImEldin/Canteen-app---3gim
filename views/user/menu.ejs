@@ -1,6 +1,42 @@
 <h1>Menu</h1>
 
 <div>
+    <form action="/user/menu" method="GET" style="margin-bottom:20px;">
+
+        <input type="text" name="name"
+               value="<%= filters?.name || '' %>"
+               placeholder="Search by name">
+
+        <select name="tag" class="form-select">
+            <option value="">All tags</option>
+
+            <% tags.forEach(t => { %>
+                <option value="<%= t.name %>"
+                        <%= filters.tag === t.name ? "selected" : "" %>>
+                    <%= t.name %>
+                </option>
+            <% }) %>
+        </select>
+
+        <select name="order">
+            <option value="">No ordering</option>
+
+            <option value="price_asc"
+                    <%= filters?.order === "price_asc" ? "selected" : "" %>>
+                Price: Low → High
+            </option>
+
+            <option value="price_desc"
+                    <%= filters?.order === "price_desc" ? "selected" : "" %>>
+                Price: High → Low
+            </option>
+        </select>
+
+        <button type="submit">Filter</button>
+        <a href="/user/menu">
+            <button type="button">Clear Filters</button>
+        </a>
+    </form>
     <h2>Items</h2>
 
     <ul>
