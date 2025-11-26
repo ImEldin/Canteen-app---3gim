@@ -70,6 +70,10 @@ module.exports = {
         return { success: true, user, tempPassword };
     },
 
+    async updateUser(userId, data) {
+        await userRepository.updateUser(userId, data);
+    },
+
     async lockUser(userId, minutes) {
         const lockedUntil = new Date(Date.now() + minutes*60000);
         await userRepository.updateUser(userId, { is_locked: true, locked_until: lockedUntil });

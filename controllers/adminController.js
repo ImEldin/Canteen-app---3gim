@@ -49,7 +49,44 @@ module.exports = {
         res.render('admin/create-user', { error: null, tempPassword: null });
     },
 
+    async showEditUser(req, res) {
+        const userId = req.params.id;
+        const user = await adminService.getUserDetails(userId);
+
+        if (!user) return res.status(404).send("User not found");
+
+        res.render(`admin/editUser`, { user });
+
+    },
+
+    async handleEditUser(req, res) {
+        const VALID_ROLES = ["user", "profesor", "kantina"];
+
+        const userId = req.params.id;
+
+        if (!VALID_ROLES.includes(req.body.role)) {
+            req.body.role = "user";
+        }
+
+        const data = {
+            email: req.body.email,
+            username: req.body.username,
+            phone: req.body.phone,
+            role: req.body.role
+        };
+
+        await adminService.updateUser(userId, data);
+
+        res.redirect(`/admin/user/${userId}`);
+    },
+
     async handleCreateUser(req, res) {
+        const VALID_ROLES = ["user", "profesor", "kantina"];
+
+        if (!VALID_ROLES.includes(req.body.role)) {
+            req.body.role = "user";
+        }
+
         const { email, username, role, phone_number } = req.body;
 
         try {

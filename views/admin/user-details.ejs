@@ -5,6 +5,7 @@
 <p>Username: <%= user.username %></p>
 <p>Phone: <%= user.phone_number %></p>
 <p>Role: <%= user.role %></p>
+<a href="/admin/user/edit/<%= user.id %>">Edit User</a>
 
 <h2>Security Info</h2>
 <p>Active: <%= user.is_active %></p>

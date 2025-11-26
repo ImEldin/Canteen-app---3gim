@@ -13,6 +13,8 @@ router.get('/create-user', adminController.showCreateUserForm);
 router.post('/create-user', adminController.handleCreateUser);
 
 router.get("/user/:id", adminController.userDetails);
+router.get("/user/edit/:id", adminController.showEditUser);
+router.post('/user/edit/:id', adminController.handleEditUser);
 
 router.post('/lock/:id', adminController.lockUser);
 router.post('/unlock/:id', adminController.unlockUser);
