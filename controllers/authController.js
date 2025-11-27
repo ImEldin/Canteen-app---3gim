@@ -30,7 +30,7 @@ module.exports = {
             return res.redirect('/admin');
         }
 
-        if(result.user.role === 'user'){
+        if(result.user.role === 'ucenik' || result.user.role === 'profesor') {
             return res.redirect('/user');
         }
 

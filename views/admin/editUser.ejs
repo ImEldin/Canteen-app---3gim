@@ -13,7 +13,7 @@
 
     <label>Role:</label>
     <select name="role" id="role">
-        <% const allRoles = ["user", "profesor", "kantina"]; %>
+        <% const allRoles = ["ucenik", "profesor", "kantina"]; %>
 
         <% allRoles.forEach(r => { %>
             <option value="<%= r %>" <%= user.role === r ? "selected" : "" %>>

@@ -61,12 +61,12 @@ module.exports = {
     },
 
     async handleEditUser(req, res) {
-        const VALID_ROLES = ["user", "profesor", "kantina"];
+        const VALID_ROLES = ["ucenik", "profesor", "kantina"];
 
         const userId = req.params.id;
 
         if (!VALID_ROLES.includes(req.body.role)) {
-            req.body.role = "user";
+            req.body.role = "ucenik";
         }
 
         const data = {
@@ -82,10 +82,10 @@ module.exports = {
     },
 
     async handleCreateUser(req, res) {
-        const VALID_ROLES = ["user", "profesor", "kantina"];
+        const VALID_ROLES = ["ucenik", "profesor", "kantina"];
 
         if (!VALID_ROLES.includes(req.body.role)) {
-            req.body.role = "user";
+            req.body.role = "ucenik";
         }
 
         const { email, username, role, phone_number } = req.body;

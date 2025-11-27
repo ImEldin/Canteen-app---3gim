@@ -3,12 +3,12 @@ const { MenuItem, Tag } = require("../models");
 module.exports = {
     async getAllMenuItems(where, tagWhere, orderBy) {
         return MenuItem.findAll({
-            where,  // this is only for fields on MenuItem
+            where,
             include: [
                 {
                     model: Tag,
                     where: tagWhere,
-                    required: Object.keys(tagWhere).length > 0   // only apply matching if a tag search exists
+                    required: Object.keys(tagWhere).length > 0
                 }
             ],
             ...(orderBy && { order: orderBy })

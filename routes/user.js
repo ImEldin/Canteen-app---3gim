@@ -5,7 +5,7 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 const menuController = require("../controllers/menuController")
 
 router.use(requireAuth);
-router.use(requireRole('user'));
+router.use(requireRole(['ucenik', 'profesor']));
 
 router.get('/', userController.showDashboard);
 router.get("/menu", menuController.showMenu);
