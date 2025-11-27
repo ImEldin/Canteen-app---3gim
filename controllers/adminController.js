@@ -1,5 +1,6 @@
 const adminService = require('../services/adminService');
 
+
 module.exports = {
     showDashboard(req, res) {
         res.render('admin/dashboard');
@@ -100,6 +101,27 @@ module.exports = {
 
         } catch (err) {
             res.render('admin/create-user', { error: err.message, tempPassword: null });
+        }
+    },
+
+    async exportTempPasswords(req, res) {
+        try {
+            const workbook = await adminService.exportTempPasswords();
+
+            res.setHeader(
+                "Content-Type",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            );
+            res.setHeader(
+                "Content-Disposition",
+                'attachment; filename="temp-passwords.xlsx"'
+            );
+
+            await workbook.xlsx.write(res);
+            res.end();
+        } catch (error) {
+            console.error("Export error:", error);
+            res.render('admin/create-user', { error: 'Failed to export temporary passwords.' });
         }
     },
 

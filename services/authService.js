@@ -1,4 +1,5 @@
 const userRepository = require('../repositories/userRepository');
+const tempPasswordRepository = require('../repositories/tempPasswordRepository');
 const bcrypt = require('bcrypt');
 
 module.exports = {
@@ -54,6 +55,7 @@ module.exports = {
 
         const hashed = await bcrypt.hash(newPassword, 10);
         await userRepository.updatePassword(userId, hashed);
+        await tempPasswordRepository.deleteByEmail(user.email);
 
         return { success: true };
     }

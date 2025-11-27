@@ -21,4 +21,6 @@ router.post('/unlock/:id', adminController.unlockUser);
 router.post('/reset-password/:id', adminController.resetPassword);
 router.post('/delete/:id', adminController.deleteUser);
 
+router.get("/export-temp-passwords", adminController.exportTempPasswords);
+
 module.exports = router;

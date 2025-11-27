@@ -1,7 +1,9 @@
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const userRepository = require('../repositories/userRepository');
+const tempPasswordRepository = require('../repositories/tempPasswordRepository');
 const { Op } = require('sequelize');
+const ExcelJS = require("exceljs");
 
 function generateTempPassword() {
     return crypto.randomBytes(4).toString('base64')
@@ -67,6 +69,8 @@ module.exports = {
             role,
         });
 
+        await tempPasswordRepository.saveTempPassword(email, tempPassword);
+
         return { success: true, user, tempPassword };
     },
 
@@ -92,5 +96,31 @@ module.exports = {
 
     async deleteUser(userId) {
         await userRepository.deleteUser(userId);
+    },
+
+    async exportTempPasswords() {
+        const records = await tempPasswordRepository.getAll();
+
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet("Temp Passwords");
+
+        sheet.addRow(["ID", "Email", "Password"]);
+
+        for (const row of records) {
+            sheet.addRow([row.id, row.email, row.password]);
+        }
+
+        sheet.getRow(1).font = { bold: true };
+
+        sheet.columns.forEach(column => {
+            let maxLength = 10;
+            column.eachCell({ includeEmpty: true }, cell => {
+                const length = cell.value ? cell.value.toString().length : 10;
+                if (length > maxLength) maxLength = length;
+            });
+            column.width = maxLength + 2;
+        });
+
+        return workbook;
     }
 };
