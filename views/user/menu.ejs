@@ -52,6 +52,11 @@
 <hr>
 
 <div>
+    <% if (typeof error !== "undefined") { %>
+        <div class="alert alert-danger">
+            <%= error %>
+        </div>
+    <% } %>
     <h2>Your Cart</h2>
 
     <% if (cart.length === 0) { %>

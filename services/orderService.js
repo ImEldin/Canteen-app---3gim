@@ -7,6 +7,21 @@ module.exports = {
         }
         const { break_slot, pickup_time } = pickup;
 
+        const [hour, minute] = pickup_time.split(":").map(Number);
+        if (hour < 9 || hour > 15 || (hour === 15 && minute > 0)) {
+            throw new Error("Pickup time must be between 09:00 and 15:00.");
+        }
+
+        const now = new Date();
+        const thirtyMinFromNow = new Date(now.getTime() + 30 * 60 * 1000);
+
+        const pickupDate = new Date();
+        pickupDate.setHours(hour, minute, 0, 0);
+
+        if (pickupDate < thirtyMinFromNow) {
+            throw new Error("Pickup time must be at least 30 minutes from now.");
+        }
+
         if(break_slot && pickup_time){
             throw new Error("Please select either a break slot or a specific pickup time, not both.");
         }

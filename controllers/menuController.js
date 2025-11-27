@@ -98,7 +98,36 @@ module.exports = {
             res.redirect("/user/orders");
         }catch (error) {
             console.error("Error placing order:", error);
-            res.status(400).send("An error occurred while placing your order. Please try again.");
+
+            let order = req.query.order;
+            let orderBy = null;
+
+            if (order === "price_asc") {
+                orderBy = [["price", "ASC"]];
+            } else if (order === "price_desc") {
+                orderBy = [["price", "DESC"]];
+            }
+
+            const filters = {
+                tag: req.query.tag || "",
+                name: req.query.name || "",
+                orderBy: orderBy
+            };
+
+            const [menu, tags] = await menuService.getMenuItems(filters);
+
+            const cart = req.session.cart || [];
+
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+            return res.render("user/menu", {
+                menu,
+                cart,
+                total,
+                filters,
+                tags,
+                error: error.message
+            });
         }
     },
 
