@@ -78,6 +78,15 @@ module.exports = {
         }
     },
 
+    async deleteAllOrders() {
+        try {
+            await Order.destroy({ where: {} });
+        } catch (err) {
+            console.error("Error deleting all orders:", err);
+            throw new Error("Failed to delete all orders.");
+        }
+    },
+
     async getAllOrders(where = {}, userWhere = {}, orderBy = null) {
         try {
             const hasUserFilters =

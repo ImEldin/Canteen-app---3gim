@@ -13,6 +13,7 @@ const authRouter = require('./routes/auth');
 const adminRouter = require('./routes/admin');
 const userRouter = require('./routes/user');
 const canteenRouter = require('./routes/canteen');
+const scheduleDailyCleanup = require("./utils/scheduler");
 
 var app = express();
 
@@ -51,6 +52,8 @@ app.use('/canteen', canteenRouter);
 app.get('/', (req, res) => {
   res.redirect('/auth/login');
 });
+
+scheduleDailyCleanup();
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -54,15 +54,5 @@ module.exports = {
             console.error(err);
             res.status(500).render('error', { message: 'Failed to deactivate menu.' });
         }
-    },
-
-    async deleteMenu(req, res) {
-        try {
-            await menuService.deleteMenu();
-            res.redirect("/canteen/menu");
-        } catch (err) {
-            console.error(err);
-            res.status(500).render('error', { message: 'Failed to delete menu.' });
-        }
     }
 };

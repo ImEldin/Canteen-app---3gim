@@ -87,19 +87,19 @@ module.exports = {
         }
     },
 
-    async deleteMenu() {
+    async deleteInactiveMenuItems() {
         try {
-            const items = await MenuItem.findAll({ include: Tag });
+            const items = await MenuItem.findAll({ where: { is_active: false }, include: Tag });
 
             for (const item of items) {
                 await item.setTags([]);
             }
 
-            await MenuItem.destroy({ where: {} });
-
+            await MenuItem.destroy({ where: { is_active: false } });
         } catch (err) {
-            console.error("Error deleting menu:", err);
-            throw new Error("Failed to delete menu.");
+            console.error("Error deleting inactive menu items:", err);
+            throw new Error("Failed to delete inactive menu items.");
         }
     }
+
 };

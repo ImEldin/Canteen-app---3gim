@@ -53,13 +53,4 @@ module.exports = {
             throw new Error("Failed to deactivate menu.");
         }
     },
-
-    async deleteMenu() {
-        try {
-            return await menuRepository.deleteMenu();
-        } catch (err) {
-            console.error("Error deleting menu:", err);
-            throw new Error("Failed to delete menu.");
-        }
-    }
 };
