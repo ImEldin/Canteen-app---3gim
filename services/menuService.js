@@ -2,7 +2,7 @@ const menuRepository = require("../repositories/menuRepository");
 const {Op} = require("sequelize");
 
 module.exports = {
-    getMenuItems(filters) {
+    async getMenuItems(filters) {
 
         const where = {};
         const tagWhere = {};
@@ -21,7 +21,23 @@ module.exports = {
         ]);
     },
 
-    getMenuItemById(id) {
-        return menuRepository.getMenuItemById(id);
+    async getMenuItemById(id) {
+        return await menuRepository.getMenuItemById(id);
+    },
+
+    async createMenu(items) {
+        console.log(items);
+        if (!items || items.length === 0)
+            throw new Error("No menu items provided");
+
+        return await menuRepository.saveMenu(items);
+    },
+
+    async deactivateMenu() {
+        return await menuRepository.deactivateMenu();
+    },
+
+    async deleteMenu() {
+        return await menuRepository.deleteMenu();
     }
 };

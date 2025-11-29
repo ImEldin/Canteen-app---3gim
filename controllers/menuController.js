@@ -3,6 +3,11 @@ const orderService = require("../services/orderService");
 const e = require("express");
 
 module.exports = {
+    async getMenu(req, res) {
+        const [menu, tags] = await menuService.getMenuItems({});
+        res.render("canteen/menu", { menu, tags });
+    },
+
     async showMenu(req, res) {
 
         let order = req.query.order;

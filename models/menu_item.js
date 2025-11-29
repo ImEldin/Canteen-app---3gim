@@ -9,7 +9,11 @@ module.exports = (sequelize, DataTypes) => {
             price: { type: DataTypes.DECIMAL(10, 2), allowNull: false, defaultValue: 0 },
             image_url: DataTypes.TEXT,
             created_at: DataTypes.DATE,
-            updated_at: DataTypes.DATE
+            updated_at: DataTypes.DATE,
+            is_active: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: true,
+            }
         },
         {
             tableName: "menu_items",
@@ -20,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     MenuItem.associate = models => {
         MenuItem.belongsToMany(models.Tag, {
             through: models.MenuItemTag,
-            foreignKey: "menu_item_id"
+            foreignKey: "menu_item_id",
         });
 
         MenuItem.hasMany(models.OrderItem, {
