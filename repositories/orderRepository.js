@@ -1,82 +1,114 @@
-const { Order, OrderItem, MenuItem, User} = require("../models");
+const { Order, OrderItem, MenuItem, User } = require("../models");
 
 module.exports = {
     async createOrder(userId, items, pickup) {
-        let totalAmount = 0;
-        for (const item of items) {
-            totalAmount += item.price * item.quantity;
-        }
+        try {
+            if (!items || !Array.isArray(items) || items.length === 0) {
+                throw new Error("Order must contain at least one item.");
+            }
 
-        const order = await Order.create({
-            user_id: userId,
-            total_amount: totalAmount,
-            pickup_time: pickup.pickup_time || null,
-            break_slot: pickup.break_slot || null
-        });
+            let totalAmount = 0;
+            for (const item of items) {
+                totalAmount += item.price * item.quantity;
+            }
 
-        for (const item of items) {
-            await OrderItem.create({
-                order_id: order.id,
-                menu_item_id: item.id,
-                unit_price: item.price,
-                quantity: item.quantity,
-                total_price: item.price * item.quantity
+            const order = await Order.create({
+                user_id: userId,
+                total_amount: totalAmount,
+                pickup_time: pickup.pickup_time || null,
+                break_slot: pickup.break_slot || null
             });
-        }
 
-        return order.id;
+            for (const item of items) {
+                await OrderItem.create({
+                    order_id: order.id,
+                    menu_item_id: item.id,
+                    unit_price: item.price,
+                    quantity: item.quantity,
+                    total_price: item.price * item.quantity
+                });
+            }
+
+            return order.id;
+
+        } catch (err) {
+            console.error("Error creating order:", err);
+            throw new Error("Failed to create order.");
+        }
     },
 
     async getUserOrders(userId) {
-        return Order.findAll({
-            where: { user_id: userId },
-            include: [
-                {
-                    model: OrderItem,
-                    include: [
-                        {
-                            model: MenuItem,
-                            attributes: ["name"]
-                        }
-                    ]
-                }
-            ],
-            order: [["created_at", "DESC"]]
-        });
+        try {
+            return await Order.findAll({
+                where: { user_id: userId },
+                include: [
+                    {
+                        model: OrderItem,
+                        include: [
+                            {
+                                model: MenuItem,
+                                attributes: ["name"]
+                            }
+                        ]
+                    }
+                ],
+                order: [["created_at", "DESC"]]
+            });
+        } catch (err) {
+            console.error(`Error fetching orders for user ${userId}:`, err);
+            throw new Error("Failed to fetch user orders.");
+        }
     },
 
     async getOrderById(orderId) {
-        return Order.findByPk(orderId);
+        try {
+            return await Order.findByPk(orderId);
+        } catch (err) {
+            console.error(`Error fetching order ${orderId}:`, err);
+            throw new Error("Failed to fetch order.");
+        }
     },
 
     async deleteOrder(id) {
-        return Order.destroy({ where: { id } });
+        try {
+            return await Order.destroy({ where: { id } });
+        } catch (err) {
+            console.error(`Error deleting order ${id}:`, err);
+            throw new Error("Failed to delete order.");
+        }
     },
 
-    async getAllOrders(where, userWhere, orderBy) {
-        const hasUserFilters =
-            Object.keys(userWhere).length > 0 ||
-            Object.getOwnPropertySymbols(userWhere).length > 0;
-        return Order.findAll({
-            where,
-            include: [
-                {
-                    model: User,
-                    attributes: ["id", "username", "email", "phone_number", "role"],
-                    where: hasUserFilters ? userWhere : undefined,
-                    required: hasUserFilters
-                },
-                {
-                    model: OrderItem,
-                    include: [
-                        {
-                            model: MenuItem,
-                            attributes: ["name"]
-                        }
-                    ]
-                }
-            ],
-            ...(orderBy && { order: orderBy })
-        });
+    async getAllOrders(where = {}, userWhere = {}, orderBy = null) {
+        try {
+            const hasUserFilters =
+                Object.keys(userWhere).length > 0 ||
+                Object.getOwnPropertySymbols(userWhere).length > 0;
+
+            return await Order.findAll({
+                where,
+                include: [
+                    {
+                        model: User,
+                        attributes: ["id", "username", "email", "phone_number", "role"],
+                        where: hasUserFilters ? userWhere : undefined,
+                        required: hasUserFilters
+                    },
+                    {
+                        model: OrderItem,
+                        include: [
+                            {
+                                model: MenuItem,
+                                attributes: ["name"]
+                            }
+                        ]
+                    }
+                ],
+                ...(orderBy && { order: orderBy })
+            });
+
+        } catch (err) {
+            console.error("Error fetching all orders:", err);
+            throw new Error("Failed to fetch orders.");
+        }
     }
 };

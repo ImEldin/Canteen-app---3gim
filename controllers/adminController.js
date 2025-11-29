@@ -1,97 +1,129 @@
 const adminService = require('../services/adminService');
 
+const VALID_ROLES = ["ucenik", "profesor", "kantina"];
 
 module.exports = {
     showDashboard(req, res) {
-        res.render('admin/dashboard');
+        try {
+            res.render('admin/dashboard');
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to load dashboard.' });
+        }
     },
 
     async listUsers(req, res) {
+        try {
+            const adminId = req.session.user.id;
 
-        const adminId = req.session.user.id;
+            const page = parseInt(req.query.page) || 1;
+            const pageSize = parseInt(req.query.pageSize) || 20;
 
-        const page = parseInt(req.query.page) || 1;
-        const pageSize = parseInt(req.query.pageSize) || 20;
+            const filters = {
+                email: req.query.email || "",
+                role: req.query.role || "",
+                username: req.query.username || ""
+            };
 
-        const filters = {
-            email: req.query.email || "",
-            role: req.query.role || "",
-            username: req.query.username || ""
-        };
-
-        const { users, hasMore } = await adminService.getAllUsers(
-            {
+            const { users, hasMore } = await adminService.getAllUsers({
                 page,
                 pageSize,
                 filters,
                 excludeUserId: adminId
-            }
-        );
+            });
 
-        res.render('admin/manage-users', {
-            users,
-            filters,
-            page,
-            pageSize,
-            hasMore
-        });
+            res.render('admin/manage-users', {
+                users,
+                filters,
+                page,
+                pageSize,
+                hasMore
+            });
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to load users.' });
+        }
     },
 
     async userDetails(req, res) {
-        const id = req.params.id;
+        try {
+            const id = req.params.id;
+            const user = await adminService.getUserDetails(id);
 
-        const user = await adminService.getUserDetails(id);
-        if (!user) return res.status(404).send("User not found");
+            if (!user) return res.status(404).render('error', { message: 'User not found.' });
 
-        res.render("admin/user-details", { user });
+            res.render('admin/user-details', { user });
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to load user details.' });
+        }
     },
 
     showCreateUserForm(req, res) {
-        res.render('admin/create-user', { error: null, tempPassword: null });
+        try {
+            res.render('admin/create-user', { error: null, tempPassword: null });
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to load create user form.' });
+        }
     },
 
     async showEditUser(req, res) {
-        const userId = req.params.id;
-        const user = await adminService.getUserDetails(userId);
+        try {
+            const userId = req.params.id;
+            const user = await adminService.getUserDetails(userId);
 
-        if (!user) return res.status(404).send("User not found");
+            if (!user) return res.status(404).render('error', { message: 'User not found.' });
 
-        res.render(`admin/editUser`, { user });
+            res.render('admin/editUser', { user, error: null });
 
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to load edit user form.' });
+        }
     },
 
     async handleEditUser(req, res) {
-        const VALID_ROLES = ["ucenik", "profesor", "kantina"];
+        try {
+            const userId = req.params.id;
 
-        const userId = req.params.id;
+            if (!VALID_ROLES.includes(req.body.role)) {
+                req.body.role = "ucenik";
+            }
 
-        if (!VALID_ROLES.includes(req.body.role)) {
-            req.body.role = "ucenik";
+            const data = {
+                email: req.body.email,
+                username: req.body.username,
+                phone: req.body.phone,
+                role: req.body.role
+            };
+
+            const result = await adminService.updateUser(userId, data);
+
+            if (result && !result.success) {
+                const user = await adminService.getUserDetails(userId);
+                return res.render('admin/editUser', { user, error: result.message });
+            }
+
+            res.redirect(`/admin/user/${userId}`);
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to update user.' });
         }
-
-        const data = {
-            email: req.body.email,
-            username: req.body.username,
-            phone: req.body.phone,
-            role: req.body.role
-        };
-
-        await adminService.updateUser(userId, data);
-
-        res.redirect(`/admin/user/${userId}`);
     },
 
     async handleCreateUser(req, res) {
-        const VALID_ROLES = ["ucenik", "profesor", "kantina"];
-
-        if (!VALID_ROLES.includes(req.body.role)) {
-            req.body.role = "ucenik";
-        }
-
-        const { email, username, role, phone_number } = req.body;
-
         try {
-            const result = await adminService.createUser({ email, username, role, phone_number});
+            if (!VALID_ROLES.includes(req.body.role)) {
+                req.body.role = "ucenik";
+            }
+
+            const { email, username, role, phone_number } = req.body;
+
+            const result = await adminService.createUser({ email, username, role, phone_number });
 
             if (!result.success) {
                 return res.render('admin/create-user', { error: result.message, tempPassword: null });
@@ -100,7 +132,8 @@ module.exports = {
             res.render('admin/user-created', { error: null, tempPassword: result.tempPassword });
 
         } catch (err) {
-            res.render('admin/create-user', { error: err.message, tempPassword: null });
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to create user.' });
         }
     },
 
@@ -119,29 +152,50 @@ module.exports = {
 
             await workbook.xlsx.write(res);
             res.end();
-        } catch (error) {
-            console.error("Export error:", error);
-            res.render('admin/create-user', { error: 'Failed to export temporary passwords.' });
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to export temporary passwords.' });
         }
     },
 
     async lockUser(req, res) {
-        await adminService.lockUser(req.params.id, req.body.minutes);
-        res.redirect('/admin/manage-users');
+        try {
+            await adminService.lockUser(req.params.id, req.body.minutes);
+            res.redirect('/admin/manage-users');
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to lock user.' });
+        }
     },
 
     async unlockUser(req, res) {
-        await adminService.unlockUser(req.params.id);
-        res.redirect('/admin/manage-users');
+        try {
+            await adminService.unlockUser(req.params.id);
+            res.redirect('/admin/manage-users');
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to unlock user.' });
+        }
     },
 
     async resetPassword(req, res) {
-        const result = await adminService.resetPassword(req.params.id);
-        res.render('admin/password-reset', { tempPassword: result.tempPassword });
+        try {
+            const result = await adminService.resetPassword(req.params.id);
+            res.render('admin/password-reset', { tempPassword: result.tempPassword });
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to reset password.' });
+        }
     },
 
     async deleteUser(req, res) {
-        await adminService.deleteUser(req.params.id);
-        res.redirect('/admin/manage-users');
+        try {
+            await adminService.deleteUser(req.params.id);
+            res.redirect('/admin/manage-users');
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to delete user.' });
+        }
     }
 };

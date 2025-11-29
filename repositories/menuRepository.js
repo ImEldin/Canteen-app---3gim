@@ -2,64 +2,104 @@ const { MenuItem, Tag } = require("../models");
 const { sequelize } = require("../models");
 
 module.exports = {
-    async getAllMenuItems(where, tagWhere, orderBy) {
-        return MenuItem.findAll({
-            where: { ...where, is_active: true },
-            include: [
-                {
-                    model: Tag,
-                    where: tagWhere,
-                    required: Object.keys(tagWhere).length > 0
-                }
-            ],
-            ...(orderBy && { order: orderBy })
-        });
+    async getAllMenuItems(where = {}, tagWhere = {}, orderBy = null) {
+        try {
+            return await MenuItem.findAll({
+                where: { ...where, is_active: true },
+                include: [
+                    {
+                        model: Tag,
+                        where: tagWhere,
+                        required: Object.keys(tagWhere).length > 0
+                    }
+                ],
+                ...(orderBy && { order: orderBy })
+            });
+        } catch (err) {
+            console.error("Error fetching menu items:", err);
+            throw new Error("Failed to fetch menu items.");
+        }
     },
 
     async getMenuItemById(id) {
-        return MenuItem.findByPk(id);
+        try {
+            return await MenuItem.findByPk(id);
+        } catch (err) {
+            console.error(`Error fetching menu item with id ${id}:`, err);
+            throw new Error("Failed to fetch menu item.");
+        }
     },
 
     async getAllTags() {
-        return Tag.findAll();
+        try {
+            return await Tag.findAll();
+        } catch (err) {
+            console.error("Error fetching tags:", err);
+            throw new Error("Failed to fetch tags.");
+        }
     },
 
     async saveMenu(items) {
-        return await sequelize.transaction(async function (t) {
+        try {
+            if (!items || !Array.isArray(items) || items.length === 0) {
+                throw new Error("Menu items array is required and cannot be empty.");
+            }
 
-            await MenuItem.update({ is_active: false }, { where: {}, transaction: t });
+            await sequelize.transaction(async (t) => {
+                await MenuItem.update({ is_active: false }, { where: {}, transaction: t });
 
-            for (const item of items) {
-                const menuItem = await MenuItem.create({
-                    name: item.name,
-                    description: item.description,
-                    price: item.price
-                }, { transaction: t });
+                for (const item of items) {
+                    const menuItem = await MenuItem.create(
+                        {
+                            name: item.name,
+                            description: item.description,
+                            price: item.price
+                        },
+                        { transaction: t }
+                    );
 
-                if (item.tags && item.tags.length > 0) {
-                    for (const tagId of item.tags) {
-                        const tag = await Tag.findByPk(tagId, { transaction: t });
-                        if (tag) {
-                            await menuItem.addTag(tag, { transaction: t });
+                    if (item.tags && item.tags.length > 0) {
+                        for (const tagId of item.tags) {
+                            const tag = await Tag.findByPk(tagId, { transaction: t });
+                            if (tag) {
+                                await menuItem.addTag(tag, { transaction: t });
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+
+        } catch (err) {
+            console.error("Error saving menu:", err);
+            throw new Error("Failed to save menu.");
+        }
     },
 
     async deactivateMenu() {
-        await MenuItem.update(
-            { is_active: false },
-            { where: {} }
-        );
+        try {
+            await MenuItem.update(
+                { is_active: false },
+                { where: {} }
+            );
+        } catch (err) {
+            console.error("Error deactivating menu:", err);
+            throw new Error("Failed to deactivate menu.");
+        }
     },
 
     async deleteMenu() {
-        const items = await MenuItem.findAll({ include: Tag });
-        for (const item of items) {
-            await item.setTags([]);
+        try {
+            const items = await MenuItem.findAll({ include: Tag });
+
+            for (const item of items) {
+                await item.setTags([]);
+            }
+
+            await MenuItem.destroy({ where: {} });
+
+        } catch (err) {
+            console.error("Error deleting menu:", err);
+            throw new Error("Failed to delete menu.");
         }
-        await MenuItem.destroy({ where: {} });
     }
 };

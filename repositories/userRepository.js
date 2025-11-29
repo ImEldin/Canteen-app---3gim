@@ -1,46 +1,84 @@
 const { User } = require('../models');
 
 module.exports = {
-    getAllUsers({ where, offset, limit }) {
-
-        return User.findAll({
-            where,
-            order: [['email', 'ASC']],
-            offset,
-            limit
-        });
+    async getAllUsers({ where = {}, offset = 0, limit = 20 }) {
+        try {
+            return await User.findAll({
+                where,
+                order: [['email', 'ASC']],
+                offset,
+                limit
+            });
+        } catch (err) {
+            console.error("Error fetching users:", err);
+            throw new Error("Failed to fetch users.");
+        }
     },
 
-    findByEmail(email) {
-        return User.findOne({ where: { email } });
+    async findByEmail(email) {
+        try {
+            if (!email) throw new Error("Email is required.");
+            return await User.findOne({ where: { email } });
+        } catch (err) {
+            console.error(`Error finding user by email (${email}):`, err);
+            throw new Error("Failed to find user by email.");
+        }
     },
 
-    findById(id) {
-        return User.findByPk(id);
+    async findById(id) {
+        try {
+            if (!id) throw new Error("User ID is required.");
+            return await User.findByPk(id);
+        } catch (err) {
+            console.error(`Error finding user by id (${id}):`, err);
+            throw new Error("Failed to find user by ID.");
+        }
     },
 
-    updatePassword(id, hashedPassword) {
-        return User.update(
-            { password: hashedPassword, must_change_password: false },
-            { where: { id } }
-        );
+    async updatePassword(id, hashedPassword) {
+        try {
+            if (!id || !hashedPassword) throw new Error("ID and password are required.");
+            return await User.update(
+                { password: hashedPassword, must_change_password: false },
+                { where: { id } }
+            );
+        } catch (err) {
+            console.error(`Error updating password for user ${id}:`, err);
+            throw new Error("Failed to update password.");
+        }
     },
 
-    createUser({ email, username, password, role, phone_number }) {
-        return User.create({
-            email,
-            username,
-            phone_number,
-            password,
-            role
-        });
+    async createUser({ email, username, password, role, phone_number }) {
+        try {
+            if (!email || !username || !password || !role) {
+                throw new Error("Missing required user fields.");
+            }
+            return await User.create({ email, username, phone_number, password, role });
+        } catch (err) {
+            console.error(`Error creating user (${email}):`, err);
+            throw new Error("Failed to create user.");
+        }
     },
 
-    updateUser(id, fields) {
-        return User.update(fields, { where: { id } });
+    async updateUser(id, fields) {
+        try {
+            if (!id || !fields || Object.keys(fields).length === 0) {
+                throw new Error("ID and fields are required to update user.");
+            }
+            return await User.update(fields, { where: { id } });
+        } catch (err) {
+            console.error(`Error updating user ${id}:`, err);
+            throw new Error("Failed to update user.");
+        }
     },
 
-    deleteUser(id) {
-        return User.destroy({ where: { id } });
+    async deleteUser(id) {
+        try {
+            if (!id) throw new Error("User ID is required.");
+            return await User.destroy({ where: { id } });
+        } catch (err) {
+            console.error(`Error deleting user ${id}:`, err);
+            throw new Error("Failed to delete user.");
+        }
     }
 };
