@@ -1,5 +1,7 @@
 const { MenuItem, Tag } = require("../models");
 const { sequelize } = require("../models");
+const fs = require("fs/promises");
+const path = require("path");
 
 module.exports = {
     async getAllMenuItems(where = {}, tagWhere = {}, orderBy = null) {
@@ -53,7 +55,8 @@ module.exports = {
                         {
                             name: item.name,
                             description: item.description,
-                            price: item.price
+                            price: item.price,
+                            image_url: item.image || null,
                         },
                         { transaction: t }
                     );
@@ -93,6 +96,22 @@ module.exports = {
 
             for (const item of items) {
                 await item.setTags([]);
+
+                if (item.image_url) {
+                    const filePath = path.join(__dirname, "..", "public", item.image_url);
+
+                    try {
+                        await fs.unlink(filePath);
+                        console.log("Deleted image:", filePath);
+                    } catch (err) {
+                        if (err.code !== "ENOENT") {
+                            console.error("Failed to delete image:", filePath, err);
+                        } else {
+                            console.warn("Image not found, skipping:", filePath);
+                        }
+                    }
+                }
+
             }
 
             await MenuItem.destroy({ where: { is_active: false } });

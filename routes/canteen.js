@@ -10,7 +10,7 @@ router.use(requireRole('kantina'));
 router.get('/', canteenController.showDashboard);
 router.get('/orders', canteenController.showOrders);
 router.get("/menu", menuController.getMenu);
-router.post("/menu", canteenController.createMenu);
+router.post("/menu", canteenController.uploadMiddleware, canteenController.createMenu);
 router.post("/menu/delete", canteenController.deactivateMenu);
 
 module.exports = router;

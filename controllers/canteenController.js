@@ -1,7 +1,11 @@
 const orderService = require('../services/orderService');
 const menuService = require('../services/menuService');
+const upload = require('../utils/uploads');
 
 module.exports = {
+
+    uploadMiddleware: upload.array("images"),
+
     showDashboard(req, res) {
         try {
             const user = req.session.user;
@@ -37,7 +41,16 @@ module.exports = {
                 return res.render('canteen/menu', { error: 'Menu must contain at least one item.', items: [] });
             }
 
-            await menuService.createMenu(req.body.items);
+            const items = req.body.items;
+
+            if (req.files && req.files.length > 0) {
+                items.forEach((item, idx) => {
+                    if (req.files[idx]) {
+                        item.image = `/uploads/${req.files[idx].filename}`;
+                    }
+                });
+            }
+            await menuService.createMenu(items);
             res.redirect("/canteen/menu");
 
         } catch (err) {

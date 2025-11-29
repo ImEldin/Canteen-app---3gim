@@ -41,8 +41,15 @@
 
     <ul>
         <% menu.forEach(item => { %>
-            <li>
+            <li style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <img
+                        src="<%= item.image_url %>"
+                        alt="menu image"
+                        style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;"
+                >
+                <span>
                 <strong><%= item.name %></strong> - <%= item.price %> KM
+            </span>
                 <a href="/user/menu/add/<%= item.id %>">Add</a>
             </li>
         <% }) %>

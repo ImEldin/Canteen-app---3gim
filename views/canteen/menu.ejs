@@ -6,6 +6,13 @@
 
         <% menu.forEach(item => { %>
             <div style="border-bottom:1px solid #ccc;margin-bottom:12px;padding-bottom:10px;">
+                <% if (item.image_url) { %>
+                    <img
+                            src="<%= item.image_url %>"
+                            alt="<%= item.name %>"
+                            style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-bottom: 6px;"
+                    >
+                <% } %><br>
                 <strong><%= item.name %></strong> - $<%= item.price %><br>
                 <small><%= item.description %></small><br>
 
@@ -22,7 +29,7 @@
         <% }); %>
 
         <form method="POST" action="/canteen/menu/delete">
-            <button type="submit" style="background:red;color:white;padding:8px 14px;border:none;border-radius:6px;">
+            <button type="submit" style="background:red;color:white;padding:8px 14px;border:none;border-radius:6px; cursor:pointer;">
                 Delete Existing Menu
             </button>
         </form>
@@ -33,7 +40,8 @@
 
 <h1>Create New Menu</h1>
 
-<form id="menuForm" action="/canteen/menu" method="POST">
+<!-- Add enctype="multipart/form-data" for file uploads -->
+<form id="menuForm" action="/canteen/menu" method="POST" enctype="multipart/form-data">
     <div id="menuItemsContainer"></div>
 
     <button type="button" id="addMenuItemBtn">+ Add Menu Item</button>
@@ -68,6 +76,9 @@
             <label>Price:</label>
             <input name="items[${itemIndex}][price]" type="number" step="0.01" required>
 
+            <label>Image:</label>
+            <input type="file" name="images" accept="image/*">
+
             <div class="tags">
                 <label>Tags:</label>
                 <select id="tag-select-${itemIndex}">
@@ -93,7 +104,6 @@
         const selectedOption = select.options[select.selectedIndex];
         if (!selectedOption) return;
 
-        // provjeri da li je već dodat
         if ([...list.querySelectorAll('input')].some(input => input.value == selectedOption.value)) return;
 
         const tagHtml = `
