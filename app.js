@@ -11,8 +11,8 @@ const pool = require('./db/pool');
 
 const authRouter = require('./routes/auth');
 const adminRouter = require('./routes/admin');
-const dashboardRouter = require('./routes/dashboard');
 const userRouter = require('./routes/user');
+const canteenRouter = require('./routes/canteen');
 
 var app = express();
 
@@ -46,7 +46,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 app.use('/user', userRouter);
-app.use('/dashboard', dashboardRouter);
+app.use('/canteen', canteenRouter);
 
 app.get('/', (req, res) => {
   res.redirect('/auth/login');

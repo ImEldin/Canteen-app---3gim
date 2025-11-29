@@ -1,4 +1,4 @@
-const { Order, OrderItem, MenuItem } = require("../models");
+const { Order, OrderItem, MenuItem, User} = require("../models");
 
 module.exports = {
     async createOrder(userId, items, pickup) {
@@ -51,5 +51,32 @@ module.exports = {
 
     async deleteOrder(id) {
         return Order.destroy({ where: { id } });
+    },
+
+    async getAllOrders(where, userWhere, orderBy) {
+        const hasUserFilters =
+            Object.keys(userWhere).length > 0 ||
+            Object.getOwnPropertySymbols(userWhere).length > 0;
+        return Order.findAll({
+            where,
+            include: [
+                {
+                    model: User,
+                    attributes: ["id", "username", "email", "phone_number", "role"],
+                    where: hasUserFilters ? userWhere : undefined,
+                    required: hasUserFilters
+                },
+                {
+                    model: OrderItem,
+                    include: [
+                        {
+                            model: MenuItem,
+                            attributes: ["name"]
+                        }
+                    ]
+                }
+            ],
+            ...(orderBy && { order: orderBy })
+        });
     }
 };

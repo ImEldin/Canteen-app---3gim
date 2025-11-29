@@ -1,4 +1,6 @@
 const orderRepository = require("../repositories/orderRepository");
+const { Op } = require("sequelize");
+const util = require("util");
 
 module.exports = {
     async placeOrder(userId, cart, pickup) {
@@ -53,5 +55,47 @@ module.exports = {
 
     async deleteOrder(orderId) {
         return orderRepository.deleteOrder(orderId);
+    },
+
+    async getAllOrders(filters) {
+        const where = {};
+        const userWhere = {};
+
+        console.log(filters.user)
+
+        if (filters.user) {
+            userWhere[Op.or] = [
+                { username: { [Op.iLike]: `%${filters.user}%` } },
+                { email: { [Op.iLike]: `%${filters.user}%` } }
+            ];
+        }
+        console.log(
+            util.inspect(userWhere, {
+                showHidden: true,   // shows Symbols (Op.or, Op.iLike, etc.)
+                depth: null,        // no depth limit
+                colors: true
+            })
+        );
+
+        if (filters.break === "first_break") {
+            where.break_slot = "first_break";
+        } else if (filters.break === "second_break") {
+            where.break_slot = "second_break";
+        } else if (filters.break === "custom") {
+            where.pickup_time = { [Op.ne]: null };
+        }
+
+        let orderBy = null;
+        if (!filters.sort || filters.sort === "pickup_asc") {
+            orderBy = [["pickup_time", "ASC"]];
+        } else if (filters.sort === "pickup_desc") {
+            orderBy = [["pickup_time", "DESC"]];
+        }else if (filters.sort === "price_asc") {
+            orderBy = [["total_amount", "ASC"]];
+        } else if (filters.sort === "price_desc") {
+            orderBy = [["total_amount", "DESC"]];
+        }
+
+        return orderRepository.getAllOrders(where, userWhere, orderBy);
     }
 };

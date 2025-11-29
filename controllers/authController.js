@@ -34,7 +34,11 @@ module.exports = {
             return res.redirect('/user');
         }
 
-        return res.redirect('/dashboard');
+        if(result.user.role === 'kantina') {
+            return res.redirect('/canteen');
+        }
+
+        return res.redirect('/');
     },
 
     showChangePasswordPage(req, res) {

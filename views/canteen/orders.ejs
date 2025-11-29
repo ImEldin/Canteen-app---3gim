@@ -1,0 +1,84 @@
+<h1>All Orders</h1>
+
+<style>
+    .order-box {
+        border: 1px solid #ccc;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        background: #fafafa;
+        font-size: 14px;
+    }
+    .order-header {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+    .order-items li {
+        margin-left: 10px;
+    }
+</style>
+
+<form method="GET" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+    <input type="text" name="user" placeholder="username or email" value="<%= filters.user %>" />
+    <select name="role">
+        <option value="">All roles</option>
+        <option value="ucenik" <%= filters.role === "ucenik" ? "selected" : "" %>>Učenik</option>
+        <option value="profesor" <%= filters.role === "profesor" ? "selected" : "" %>>Profesor</option>
+    </select>
+    <select name="break">
+        <option value="">All breaks</option>
+        <option value="first_break" <%= filters.break === "first_break" ? "selected" : "" %>>First break</option>
+        <option value="second_break" <%= filters.break === "second_break" ? "selected" : "" %>>Second break</option>
+        <option value="custom" <%= filters.break === "custom" ? "selected" : "" %>>Custom time</option>
+    </select>
+    <select name="sort">
+        <option value="pickup_asc" <%= filters.sort === "pickup_asc" ? "selected" : "" %>>Pickup Time ↑</option>
+        <option value="pickup_desc" <%= filters.sort === "pickup_desc" ? "selected" : "" %>>Pickup Time ↓</option>
+        <option value="price_asc" <%= filters.sort === "price_asc" ? "selected" : "" %>>Price ↑</option>
+        <option value="price_desc" <%= filters.sort === "price_desc" ? "selected" : "" %>>Price ↓</option>
+    </select>
+    <button type="submit">Apply</button>
+    <a href="/canteen/orders">
+        <button type="button">Clear Filters</button>
+    </a>
+</form>
+
+<% orders.forEach(order => { %>
+    <div class="order-box">
+        <p>
+            <strong>User:</strong> <%= order.User.username %>
+            (<%= order.User.email %>)<br>
+            <strong>Phone:</strong> <%= order.User.phone_number %><br>
+            <strong>Role:</strong> <%= order.User.role %>
+        </p>
+
+        <p>
+            <strong>Date:</strong> <%= order.created_at.toLocaleString() %><br>
+
+            <% if (order.pickup_time) { %>
+                <strong>Pickup:</strong> <%= order.pickup_time %><br>
+            <% } %>
+
+            <% if (order.break_slot) { %>
+                <strong>Break:</strong>
+                <%= order.break_slot === "first_break" ? "First Break" : "Second Break" %><br>
+            <% } %>
+
+            <strong>Total:</strong> <%= order.total_amount %> KM
+        </p>
+
+        <strong>Items:</strong>
+        <ul class="order-items">
+            <% order.OrderItems.forEach(item => { %>
+                <li>
+                    <%= item.quantity %>× <%= item.MenuItem.name %>
+                    — <%= item.unit_price %> KM
+                </li>
+            <% }) %>
+        </ul>
+
+    </div>
+<% }) %>
+
+<a href="/canteen">Back to Dashboard</a>
