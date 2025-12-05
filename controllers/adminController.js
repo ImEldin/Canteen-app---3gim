@@ -197,5 +197,25 @@ module.exports = {
             console.error(err);
             res.status(500).render('error', { message: 'Failed to delete user.' });
         }
-    }
+    },
+
+    async banUser(req, res) {
+        try {
+            await adminService.banUser(req.params.id);
+            res.redirect('/admin/manage-users');
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to ban user.' });
+        }
+    },
+
+    async unbanUser(req, res) {
+        try {
+            await adminService.unbanUser(req.params.id);
+            res.redirect('/admin/manage-users');
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Failed to unban user.' });
+        }
+    },
 };

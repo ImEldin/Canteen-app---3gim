@@ -72,7 +72,8 @@ module.exports = {
                 role,
                 password: null,
                 phone_number: null,
-                must_change_password: false
+                must_change_password: false,
+                isMsLogin: true
             });
 
         } catch (err) {

@@ -104,8 +104,8 @@ module.exports = {
     async lockUser(userId, minutes) {
         try {
             if (!userId || !minutes) throw new Error("User ID and minutes are required.");
-            const lockedUntil = new Date(Date.now() + minutes * 60000);
-            await userRepository.updateUser(userId, { is_locked: true, locked_until: lockedUntil });
+            const lockedUntil = new Date(Date.now() + parseInt(minutes, 10) * 60000);
+            await userRepository.updateUser(userId, { is_locked: true, locked_until: lockedUntil});
         } catch (err) {
             console.error(`Error locking user ${userId}:`, err);
             throw new Error("Failed to lock user.");
@@ -145,6 +145,28 @@ module.exports = {
         } catch (err) {
             console.error(`Error deleting user ${userId}:`, err);
             throw new Error("Failed to delete user.");
+        }
+    },
+
+    async banUser(userId) {
+        try {
+            if (!userId) throw new Error("User ID is required.");
+
+            await userRepository.updateUser(userId, { banned: true });
+        } catch (err) {
+            console.error(`Error banning user ${userId}:`, err);
+            throw new Error("Failed to ban user.");
+        }
+    },
+
+    async unbanUser(userId) {
+        try {
+            if (!userId) throw new Error("User ID is required.");
+
+            await userRepository.updateUser(userId, { banned: false });
+        } catch (err) {
+            console.error(`Error unbanning user ${userId}:`, err);
+            throw new Error("Failed to unban user.");
         }
     },
 

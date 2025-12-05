@@ -32,6 +32,14 @@
     <button>Unlock</button>
 </form>
 
+<form method="POST" action="/admin/ban/<%= user.id %>">
+    <button <% if (user.banned) { %> disabled <% } %> >Ban</button>
+</form>
+
+<form method="POST" action="/admin/unban/<%= user.id %>">
+    <button <% if (!user.banned) { %> disabled <% } %> >Unban</button>
+</form>
+
 <form method="POST" action="/admin/reset-password/<%= user.id %>">
     <button>Reset Password</button>
 </form>

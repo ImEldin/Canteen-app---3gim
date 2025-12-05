@@ -16,7 +16,17 @@ module.exports = (sequelize, DataTypes) => {
             locked_until: DataTypes.DATE,
             created_at: DataTypes.DATE,
             updated_at: DataTypes.DATE,
-            last_login_at: DataTypes.DATE
+            last_login_at: DataTypes.DATE,
+            isMsLogin: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
+            },
+            banned: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
+            },
         },
         {
             tableName: "users",

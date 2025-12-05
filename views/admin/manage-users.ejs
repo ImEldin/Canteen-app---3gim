@@ -30,6 +30,12 @@
             ( <%= user.email %> ) -
             <%= user.role %>
 
+            <% if (user.banned) { %>
+                <span style="color: red; font-weight: bold; margin-left: 10px;">
+                    BANNED
+                </span>
+            <% } %>
+
             <a href="/admin/user/<%= user.id %>">View</a>
         </li>
     <% }) %>

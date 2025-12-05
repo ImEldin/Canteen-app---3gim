@@ -22,6 +22,17 @@ module.exports = {
                 }
             }
 
+            if (user.isMsLogin && (user.password === null || user.password === undefined)) {
+                return {
+                    success: false,
+                    message: 'This account uses Microsoft login only. Contact an admin to set a local password.'
+                };
+            }
+
+            if (user.banned) {
+                return { success: false, message: 'This account has been banned.' };
+            }
+
             const passwordMatch = await bcrypt.compare(password, user.password);
             if (!passwordMatch) {
                 let attempts = (user.failed_login_attempts || 0) + 1;
@@ -54,22 +65,17 @@ module.exports = {
         try {
             if (!code) throw new Error("Authorization code is required.");
 
-            const clientId = process.env.CLIENT_ID;
-            const clientSecret = process.env.CLIENT_SECRET;
-            const redirectUri = process.env.MICROSOFT_REDIRECT_URI;
-            const tenant = process.env.TENANT_ID;
-
             const response = await fetch(
-                `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`,
+                `https://login.microsoftonline.com/${process.env.TENANT_ID}/oauth2/v2.0/token`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: new URLSearchParams({
-                        client_id: clientId,
-                        client_secret: clientSecret,
+                        client_id: process.env.CLIENT_ID,
+                        client_secret: process.env.CLIENT_SECRET,
                         grant_type: "authorization_code",
                         code,
-                        redirect_uri: redirectUri
+                        redirect_uri: process.env.MICROSOFT_REDIRECT_URI
                     })
                 }
             );
@@ -101,14 +107,26 @@ module.exports = {
             const username = email.split("@")[0];
 
             let user = await userRepository.findByEmail(email);
+            console.log(user)
+
+            if (user && user.is_locked) {
+                const now = new Date();
+                if (user.locked_until && now < user.locked_until) {
+                    return { success: false, message: 'Account is locked. Try again later.' };
+                } else {
+                    await user.update({ is_locked: false, failed_login_attempts: 0, locked_until: null });
+                }
+            }
+
+            if (user.banned) {
+                return { success: false, message: 'This account has been banned.' };
+            }
 
             if (!user) {
                 user = await userRepository.createWithoutPassword({
                     email,
                     username,
-                    password: null,
                     role: "ucenik",
-                    must_change_password: false
                 });
             }
 
