@@ -96,7 +96,7 @@ module.exports = {
             const data = {
                 email: req.body.email,
                 username: req.body.username,
-                phone: req.body.phone,
+                phone_number: req.body.phone_number,
                 role: req.body.role
             };
 

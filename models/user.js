@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
             email: { type: DataTypes.TEXT, allowNull: false, unique: true },
             phone_number: DataTypes.STRING,
             role: { type: DataTypes.TEXT, allowNull: false },
-            password: { type: DataTypes.TEXT, allowNull: false },
+            password: { type: DataTypes.TEXT, allowNull: true },
             must_change_password: { type: DataTypes.BOOLEAN, defaultValue: true },
             is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
             is_locked: { type: DataTypes.BOOLEAN, defaultValue: false },

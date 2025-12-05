@@ -60,6 +60,27 @@ module.exports = {
         }
     },
 
+    async createWithoutPassword({ email, username, role }) {
+        try {
+            if (!email || !username || !role) {
+                throw new Error("Missing required user fields.");
+            }
+
+            return await User.create({
+                email,
+                username,
+                role,
+                password: null,
+                phone_number: null,
+                must_change_password: false
+            });
+
+        } catch (err) {
+            console.error(`Error creating MS user (${email}):`, err);
+            throw new Error("Failed to create MS user.");
+        }
+    },
+
     async updateUser(id, fields) {
         try {
             if (!id || !fields || Object.keys(fields).length === 0) {
