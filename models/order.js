@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     );
 
     Order.associate = models => {
-        Order.belongsTo(models.User, { foreignKey: "user_id" });
+        Order.belongsTo(models.User, { foreignKey: "user_id", onDelete: "CASCADE" });
 
         Order.hasMany(models.OrderItem, {
             foreignKey: "order_id",
