@@ -1,44 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create User</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/stylesheets/admin/createUser.css">
+    <link rel="stylesheet" href="/stylesheets/loadingSpinner.css">
+    <link rel="stylesheet" href="/stylesheets/admin/adminTopBar.css">
+    <link rel="stylesheet" href="/stylesheets/admin/adminBody.css">
 </head>
 <body>
-<h1>Create New User</h1>
+<div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+</div>
 
-<% if (error) { %>
-    <p style="color:red;"><%= error %></p>
-<% } %>
+<div id="bg-fixed"></div>
 
-<% if (tempPassword) { %>
-    <p style="color:green;">User created successfully! Temporary password: <strong><%= tempPassword %></strong></p>
-<% } %>
+<div class="top-bar">
+    <div class="admin-info">
+        <div class="admin-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+        <span class="admin-name"><%= user.username %></span>
+    </div>
+    <div class="nav-actions">
+        <a href="/admin" class="back-btn">Dashboard</a>
+        <a href="/auth/logout" class="logout-btn">Odjavi se</a>
+    </div>
+</div>
 
-<form action="/admin/create-user" method="POST">
-    <label>Email:</label>
-    <input type="email" name="email" required><br><br>
+<div class="content-wrapper">
+    <div class="form-container">
+        <div class="form-card">
+            <h1 class="form-title">Create New User</h1>
 
-    <label>Username:</label>
-    <input type="text" name="username" required><br><br>
+            <% if (error) { %>
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-circle"></i> <%= error %>
+                </div>
+            <% } %>
 
-    <label>Phone Number:</label>
-    <input type="text" name="phone_number" required><br><br>
+            <% if (tempPassword) { %>
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle"></i> User created successfully!<br>
+                    <strong>Temporary password:</strong> <code><%= tempPassword %></code>
+                </div>
+            <% } %>
 
-    <label>Role:</label>
-    <select name="role" required>
-        <option value="ucenik">Ucenik</option>
-        <option value="kantina">Kantina</option>
-        <option value="profesor">Profesor</option>
-    </select><br><br>
+            <form action="/admin/create-user" method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
 
-    <button type="submit">Create User</button>
-</form>
-<a href="/admin/export-temp-passwords"
-   class="btn btn-success"
-   style="margin-bottom: 15px;">
-    Export Temp Passwords
-</a>
-<br>
-<a href="/admin">Back</a>
+                <div class="form-row">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" name="phone_number" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 role-field">
+                    <label class="form-label">Role</label>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select" id="roleSelect">
+                            <span class="selected-text">Ucenik</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="custom-options" id="roleOptions">
+                            <div class="custom-option selected" data-value="ucenik">Ucenik</div>
+                            <div class="custom-option" data-value="kantina">Kantina</div>
+                            <div class="custom-option" data-value="profesor">Profesor</div>
+                        </div>
+                        <input type="hidden" name="role" id="roleInput" value="ucenik" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-person-add"></i> Create User
+                </button>
+            </form>
+
+            <div class="action-links">
+                <a href="/admin/export-temp-passwords" class="btn btn-secondary">
+                    <i class="bi bi-download"></i> Export Temp Passwords
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/javascripts/admin/createUser.js"></script>
+<script>
+    window.addEventListener('load', function() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+    });
+</script>
 </body>
 </html>
