@@ -8,12 +8,19 @@
     --error-red: #ef4444;
 }
 
-html, body {
+html {
+    height: 100%;
+}
+
+body {
     margin: 0;
     padding: 0;
     width: 100%;
+    min-height: 100%;
     overflow-x: hidden;
-    overscroll-behavior-x: none;
+    overflow-y: auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
 }
 
 * {
@@ -26,16 +33,17 @@ html, body {
     position: fixed;
     top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
     height: 100%;
+    height: 100lvh;
     background-image: url("/images/background.png");
     background-size: cover;
     background-position: center 55%;
     background-repeat: no-repeat;
     z-index: -2;
-
-    transform: translate3d(0,0,0);
-    backface-visibility: hidden;
+    pointer-events: none;
 }
 
 body::before {
@@ -50,7 +58,7 @@ body::before {
             radial-gradient(circle, var(--primary-purple) 1px, transparent 1px);
     background-size: 50px 50px, 80px 80px;
     background-position: 0 0, 25px 25px;
-    background-repeat: repeat, repeat;
+    background-repeat: repeat;
     opacity: 0.15;
 }
 
@@ -75,6 +83,12 @@ body::before {
     backdrop-filter: blur(10px);
     position: relative;
     overflow: hidden;
+    z-index: 1;
+}
+
+.login-card * {
+    position: relative;
+    z-index: 2;
 }
 
 .login-card::before {
@@ -87,6 +101,7 @@ body::before {
     background: var(--lighter-purple);
     border-radius: 50%;
     opacity: 0.5;
+    z-index: 0;
 }
 
 .login-card::after {
@@ -99,6 +114,7 @@ body::before {
     background: var(--light-purple);
     border-radius: 50%;
     opacity: 0.4;
+    z-index: 0;
 }
 
 .school-logo {
@@ -231,12 +247,20 @@ body::before {
         padding: 30px 20px;
     }
 
+    .login-card::after {
+        width: 70px;
+        height: 70px;
+        bottom: -20px;
+        left: -20px;
+    }
+
     .school-name {
         font-size: 1.5rem;
     }
 
     .school-logo {
-        width: 230px;
+        width: 100%;
+        max-width: 230px;
         height: auto;
     }
 
@@ -249,6 +273,7 @@ body::before {
     .login-card {
         padding: 50px 40px;
     }
+
 }
 
 @media (min-width: 1200px) {

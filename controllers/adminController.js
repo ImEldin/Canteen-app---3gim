@@ -5,7 +5,9 @@ const VALID_ROLES = ["ucenik", "profesor", "kantina"];
 module.exports = {
     showDashboard(req, res) {
         try {
-            res.render('admin/dashboard');
+            const user = req.session.user;
+            console.log(user);
+            res.render('admin/dashboard', { user });
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Failed to load dashboard.' });

@@ -1,4 +1,49 @@
-<h1>Admin Dashboard</h1>
-<a href="/admin/manage-users">Manage Users</a> |
-<a href="/admin/create-user">Create User</a> |
-<a href="/auth/logout">Logout</a>
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/stylesheets/adminDashboard.css">
+    <link rel="stylesheet" href="/stylesheets/loadingSpinner.css">
+</head>
+<body>
+<div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+</div>
+<div id="bg-fixed"></div>
+
+<div class="top-bar">
+    <div class="admin-info">
+        <div class="admin-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+        <span class="admin-name"><%= user.username %></span>
+    </div>
+    <a href="/auth/logout" class="logout-btn">Odjavi se</a>
+</div>
+
+<div class="dashboard-container">
+    <div class="cards-wrapper">
+        <a href="/admin/manage-users" class="dashboard-card">
+            <div class="card-icon">
+                <img src="/images/user-edit.png" alt="Manage Users">
+            </div>
+            <div class="card-title">Upravljanje korisnicima</div>
+            <div class="card-description">Pregled i uređivanje korisnika</div>
+        </a>
+
+        <a href="/admin/create-user" class="dashboard-card">
+            <div class="card-icon">
+                <img src="/images/user-add.png" alt="Create User">
+            </div>
+            <div class="card-title">Dodaj korisnika</div>
+            <div class="card-description">Dodaj novi korisnički račun</div>
+        </a>
+    </div>
+</div>
+</body>
+<script>
+    window.addEventListener('load', function() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+    });
+</script>
+</html>
