@@ -82,6 +82,11 @@ module.exports = {
                 role,
             });
 
+            const temp = tempPasswordRepository.getByEmail(email);
+            if (temp) {
+                await tempPasswordRepository.deleteByEmail(email);
+            }
+
             await tempPasswordRepository.saveTempPassword(email, tempPassword);
 
             return { success: true, user, tempPassword };

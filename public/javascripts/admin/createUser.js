@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const btn = this;
             const originalHTML = btn.innerHTML;
 
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Downloading...';
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Preuzimanje...';
             btn.style.pointerEvents = 'none';
 
             setTimeout(() => {
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (createForm) {
         createForm.addEventListener('submit', function() {
             const btn = this.querySelector('button[type="submit"]');
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creating User...';
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Kreiranje korisnika...';
             btn.disabled = true;
 
             window.addEventListener('beforeunload', () => {

@@ -29,6 +29,21 @@ module.exports = {
         }
     },
 
+    async getByEmail(email) {
+        try {
+            if (!email) {
+                throw new Error("Email is required.");
+            }
+
+            return await TempPassword.findOne({
+                where: { email }
+            });
+        } catch (err) {
+            console.error(`Error fetching temp password for ${email}:`, err);
+            throw new Error("Failed to fetch temporary password.");
+        }
+    },
+
     async getAll() {
         try {
             return await TempPassword.findAll();

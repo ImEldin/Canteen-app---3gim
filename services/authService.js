@@ -107,7 +107,6 @@ module.exports = {
             const username = email.split("@")[0];
 
             let user = await userRepository.findByEmail(email);
-            console.log(user)
 
             if (user && user.is_locked) {
                 const now = new Date();

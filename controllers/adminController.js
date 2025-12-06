@@ -66,7 +66,22 @@ module.exports = {
     showCreateUserForm(req, res) {
         try {
             const user = req.session.user;
-            res.render('admin/create-user', { error: null, tempPassword: null, user });
+
+            const success = req.session.success;
+            const error = req.session.error;
+            const tempPassword = req.session.tempPassword;
+
+            req.session.success = null;
+            req.session.error = null;
+            req.session.tempPassword = null;
+
+            res.render("admin/create-user", {
+                user,
+                success,
+                error,
+                tempPassword
+            });
+
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Failed to load create user form.' });
@@ -129,10 +144,14 @@ module.exports = {
             const result = await adminService.createUser({ email, username, role, phone_number });
 
             if (!result.success) {
-                return res.render('admin/create-user', { error: result.message, tempPassword: null });
+                req.session.error = result.message;
+                return res.redirect("/admin/create-user");
             }
 
-            res.render('admin/user-created', { error: null, tempPassword: result.tempPassword });
+            req.session.success = "User created successfully!";
+            req.session.tempPassword = result.tempPassword;
+
+            return res.redirect("/admin/create-user");
 
         } catch (err) {
             console.error(err);
