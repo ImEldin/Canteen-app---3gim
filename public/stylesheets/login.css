@@ -220,7 +220,7 @@ body::before {
 }
 
 .error-message strong {
-    margin-right: 8px;
+    margin-right: 2px;
 }
 
 .close-btn {

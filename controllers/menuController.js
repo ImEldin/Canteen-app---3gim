@@ -150,7 +150,8 @@ module.exports = {
             const userId = req.session.user.id;
             const user = req.session.user;
             const orders = await orderService.userOrders(userId);
-            res.render("user/orders", { orders, error: null, user});
+            const { error, success } = req.query;
+            res.render("user/orders", { orders, error, user, success});
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Neuspjelo učitavanje narudžbi.' });
@@ -167,8 +168,13 @@ module.exports = {
                 return res.status(403).render('error', { message: 'Nemate ovlasti za brisanje ove narudžbe.' });
             }
 
-            await orderService.deleteOrder(orderId);
-            res.redirect("/user/orders");
+            const deleted = await orderService.deleteOrder(orderId);
+            if (!deleted) {
+                return res.redirect('/user/orders?error=Greška pri brisanju narudžbe.');
+            }
+
+            return res.redirect('/user/orders?success=Narudžba je uspješno obrisana.');
+
 
         } catch (err) {
             console.error(err);

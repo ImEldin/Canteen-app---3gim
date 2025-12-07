@@ -37,6 +37,19 @@
             </a>
         </div>
     </div>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="error-message">
+            <span><strong>Greška!</strong> <%= error %></span>
+            <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+    <% } %>
+
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="success-message">
+            <span><%= success %></span>
+            <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+    <% } %>
     <% if (orders.length > 0) { %>
         <% orders.forEach(order => { %>
             <div class="order-card">
