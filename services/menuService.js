@@ -21,27 +21,27 @@ module.exports = {
             ]);
         } catch (err) {
             console.error("Error fetching menu items:", err);
-            throw new Error("Failed to fetch menu items.");
+            throw new Error("Nije moguće dohvatiti stavke menija.");
         }
     },
 
     async getMenuItemById(id) {
         try {
-            if (!id) throw new Error("Menu item ID is required.");
+            if (!id) throw new Error("ID stavka menija je obavezna.");
             return await menuRepository.getMenuItemById(id);
         } catch (err) {
             console.error(`Error fetching menu item ${id}:`, err);
-            throw new Error("Failed to fetch menu item.");
+            throw new Error("Nije moguće dohvatiti stavku menija.");
         }
     },
 
     async createMenu(items) {
         try {
-            if (!items || items.length === 0) throw new Error("No menu items provided.");
+            if (!items || items.length === 0) throw new Error("Nijedna stavka menija nije dostavljena.");
             return await menuRepository.saveMenu(items);
         } catch (err) {
             console.error("Error creating menu:", err);
-            throw new Error("Failed to create menu.");
+            throw new Error("Nije moguće kreirati meni.");
         }
     },
 
@@ -50,7 +50,7 @@ module.exports = {
             return await menuRepository.deactivateMenu();
         } catch (err) {
             console.error("Error deactivating menu:", err);
-            throw new Error("Failed to deactivate menu.");
+            throw new Error("Nije moguće deaktivirati meni.");
         }
     },
 };

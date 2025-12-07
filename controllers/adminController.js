@@ -10,7 +10,7 @@ module.exports = {
             res.render('admin/dashboard', { user });
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load dashboard.' });
+            res.status(500).render('error', { message: 'Greška pri učitavanju početne stranice.' });
         }
     },
 
@@ -46,7 +46,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load users.' });
+            res.status(500).render('error', { message: 'Greška pri učitavanju korisnika.' });
         }
     },
 
@@ -56,7 +56,7 @@ module.exports = {
             const id = req.params.id;
             const user = await adminService.getUserDetails(id);
 
-            if (!user) return res.status(404).render('error', { message: 'User not found.' });
+            if (!user) return res.status(404).render('error', { message: 'Korisnik nije pronađen.' });
 
             const successMessage = req.query.success || null;
 
@@ -67,7 +67,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load user details.' });
+            res.status(500).render('error', { message: 'Greška pri učitavanju detalja korisnika.' });
         }
     },
 
@@ -92,7 +92,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load create user form.' });
+            res.status(500).render('error', { message: 'Greška pri učitavanju forme za kreiranje korisnika.' });
         }
     },
 
@@ -102,13 +102,13 @@ module.exports = {
             const admin = req.session.user;
             const user = await adminService.getUserDetails(userId);
 
-            if (!user) return res.status(404).render('error', { message: 'User not found.' });
+            if (!user) return res.status(404).render('error', { message: 'Korisnik nije pronađen.' });
 
             res.render('admin/edit-User', { user, error: null, admin});
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load edit user form.' });
+            res.status(500).render('error', { message: 'Greška pri učitavanju forme za uređivanje korisnika.' });
         }
     },
 
@@ -134,11 +134,11 @@ module.exports = {
                 return res.render('admin/edit-user', { user, error: result.message });
             }
 
-            res.redirect(`/admin/user/${userId}?success=Korisnik je uspješno izmjenjen.`);
+            res.redirect(`/admin/user/${userId}?success=Korisnik je uspješno izmijenjen.`);
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to update user.' });
+            res.status(500).render('error', { message: 'Greška pri ažuriranju korisnika.' });
         }
     },
 
@@ -157,14 +157,14 @@ module.exports = {
                 return res.redirect("/admin/create-user");
             }
 
-            req.session.success = "User created successfully!";
+            req.session.success = "Korisnik je uspješno kreiran!";
             req.session.tempPassword = result.tempPassword;
 
             return res.redirect("/admin/create-user");
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to create user.' });
+            res.status(500).render('error', { message: 'Greška pri kreiranju korisnika.' });
         }
     },
 
@@ -186,7 +186,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to export temporary passwords.' });
+            res.status(500).render('error', { message: 'Greška pri izvozu privremenih lozinki.' });
         }
     },
 
@@ -196,7 +196,7 @@ module.exports = {
             res.redirect(`/admin/user/${req.params.id}?success=Korisnik je zaključan.`);
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to lock user.' });
+            res.status(500).render('error', { message: 'Greška pri zaključavanju korisnika.' });
         }
     },
 
@@ -206,7 +206,7 @@ module.exports = {
             res.redirect(`/admin/user/${req.params.id}?success=Korisnik je otključan.`);
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to unlock user.' });
+            res.status(500).render('error', { message: 'Greška pri otključavanju korisnika.' });
         }
     },
 
@@ -217,7 +217,7 @@ module.exports = {
             res.redirect(`/admin/user/${req.params.id}?success=Lozinka uspješno resetovana.`);
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to reset password.' });
+            res.status(500).render('error', { message: 'Greška pri resetovanju lozinke.' });
         }
     },
 
@@ -227,7 +227,7 @@ module.exports = {
             res.redirect('/admin/manage-users');
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to delete user.' });
+            res.status(500).render('error', { message: 'Greška pri brisanju korisnika.' });
         }
     },
 
@@ -237,7 +237,7 @@ module.exports = {
             res.redirect(`/admin/user/${req.params.id}?success=Korisnik je deaktiviran.`);
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to ban user.' });
+            res.status(500).render('error', { message: 'Greška pri deaktiviranju korisnika.' });
         }
     },
 
@@ -247,7 +247,7 @@ module.exports = {
             res.redirect(`/admin/user/${req.params.id}?success=Korisnik je aktiviran.`);
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to unban user.' });
+            res.status(500).render('error', { message: 'Greška pri aktiviranju korisnika.' });
         }
     },
 };

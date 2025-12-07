@@ -48,27 +48,27 @@ module.exports = {
             };
         } catch (err) {
             console.error("Error getting all users:", err);
-            throw new Error("Failed to fetch users.");
+            throw new Error("Greška pri učitavanju liste korisnika.");
         }
     },
 
     async getUserDetails(userId) {
         try {
-            if (!userId) throw new Error("User ID is required.");
+            if (!userId) throw new Error("Greška: nedostaje ID korisnika.");
             return await userRepository.findById(userId);
         } catch (err) {
             console.error(`Error fetching user details for ${userId}:`, err);
-            throw new Error("Failed to fetch user details.");
+            throw new Error("Greška pri učitavanju detalja korisnika.");
         }
     },
 
     async createUser({ email, username, role, phone_number }) {
         try {
-            if (!email || !username || !role) throw new Error("Missing required fields.");
+            if (!email || !username || !role) throw new Error("Greška: nedostaju obavezna polja.");
 
             const existing = await userRepository.findByEmail(email);
             if (existing) {
-                return { success: false, message: 'Email already exists' };
+                return { success: false, message: 'Email već postoji' };
             }
 
             const tempPassword = generateTempPassword();
@@ -92,44 +92,44 @@ module.exports = {
             return { success: true, user, tempPassword };
         } catch (err) {
             console.error("Error creating user:", err);
-            throw new Error("Failed to create user.");
+            throw new Error("Greška pri kreiranju korisnika.");
         }
     },
 
     async updateUser(userId, data) {
         try {
-            if (!userId || !data) throw new Error("User ID and data are required.");
+            if (!userId || !data) throw new Error("Greška: potreban je ID korisnika i podaci.");
             await userRepository.updateUser(userId, data);
         } catch (err) {
             console.error(`Error updating user ${userId}:`, err);
-            throw new Error("Failed to update user.");
+            throw new Error("Greška pri ažuriranju korisnika.");
         }
     },
 
     async lockUser(userId, minutes) {
         try {
-            if (!userId || !minutes) throw new Error("User ID and minutes are required.");
+            if (!userId || !minutes) throw new Error("Greška: potreban je ID korisnika i trajanje zaključavanja.");
             const lockedUntil = new Date(Date.now() + parseInt(minutes, 10) * 60000);
             await userRepository.updateUser(userId, { is_locked: true, locked_until: lockedUntil});
         } catch (err) {
             console.error(`Error locking user ${userId}:`, err);
-            throw new Error("Failed to lock user.");
+            throw new Error("Greška pri zaključavanju korisnika.");
         }
     },
 
     async unlockUser(userId) {
         try {
-            if (!userId) throw new Error("User ID is required.");
+            if (!userId) throw new Error("Greška: nedostaje ID korisnika.");
             await userRepository.updateUser(userId, { is_locked: false, locked_until: null, failed_login_attempts: 0 });
         } catch (err) {
             console.error(`Error unlocking user ${userId}:`, err);
-            throw new Error("Failed to unlock user.");
+            throw new Error("Greška pri otključavanju korisnika.");
         }
     },
 
     async resetPassword(userId) {
         try {
-            if (!userId) throw new Error("User ID is required.");
+            if (!userId) throw new Error("Greška: nedostaje ID korisnika.");
 
             const tempPassword = generateTempPassword();
             const hashedPassword = await bcrypt.hash(tempPassword, 10);
@@ -139,39 +139,39 @@ module.exports = {
             return { tempPassword };
         } catch (err) {
             console.error(`Error resetting password for user ${userId}:`, err);
-            throw new Error("Failed to reset password.");
+            throw new Error("Greška pri resetovanju lozinke.");
         }
     },
 
     async deleteUser(userId) {
         try {
-            if (!userId) throw new Error("User ID is required.");
+            if (!userId) throw new Error("Greška: nedostaje ID korisnika.");
             await userRepository.deleteUser(userId);
         } catch (err) {
             console.error(`Error deleting user ${userId}:`, err);
-            throw new Error("Failed to delete user.");
+            throw new Error("Greška pri brisanju korisnika.");
         }
     },
 
     async banUser(userId) {
         try {
-            if (!userId) throw new Error("User ID is required.");
+            if (!userId) throw new Error("Greška: nedostaje ID korisnika.");
 
             await userRepository.updateUser(userId, { banned: true });
         } catch (err) {
             console.error(`Error banning user ${userId}:`, err);
-            throw new Error("Failed to ban user.");
+            throw new Error("Greška pri deaktivaciji korisnika.");
         }
     },
 
     async unbanUser(userId) {
         try {
-            if (!userId) throw new Error("User ID is required.");
+            if (!userId) throw new Error("Greška: nedostaje ID korisnika.");
 
             await userRepository.updateUser(userId, { banned: false });
         } catch (err) {
             console.error(`Error unbanning user ${userId}:`, err);
-            throw new Error("Failed to unban user.");
+            throw new Error("Greška pri aktivaciji korisnika.");
         }
     },
 
@@ -202,7 +202,7 @@ module.exports = {
             return workbook;
         } catch (err) {
             console.error("Error exporting temp passwords:", err);
-            throw new Error("Failed to export temporary passwords.");
+            throw new Error("Greška pri izvozu privremenih lozinki.");
         }
     }
 };

@@ -19,7 +19,7 @@ module.exports = {
             });
         } catch (err) {
             console.error("Error fetching menu items:", err);
-            throw new Error("Failed to fetch menu items.");
+            throw new Error("Nije moguće dohvatiti stavke menija.");
         }
     },
 
@@ -28,7 +28,7 @@ module.exports = {
             return await MenuItem.findByPk(id);
         } catch (err) {
             console.error(`Error fetching menu item with id ${id}:`, err);
-            throw new Error("Failed to fetch menu item.");
+            throw new Error("Nije moguće dohvatiti stavku menija.");
         }
     },
 
@@ -37,14 +37,14 @@ module.exports = {
             return await Tag.findAll();
         } catch (err) {
             console.error("Error fetching tags:", err);
-            throw new Error("Failed to fetch tags.");
+            throw new Error("Nije moguće dohvatiti tagove.");
         }
     },
 
     async saveMenu(items) {
         try {
             if (!items || !Array.isArray(items) || items.length === 0) {
-                throw new Error("Menu items array is required and cannot be empty.");
+                throw new Error("Lista stavki menija je obavezna i ne smije biti prazna.");
             }
 
             await sequelize.transaction(async (t) => {
@@ -74,7 +74,7 @@ module.exports = {
 
         } catch (err) {
             console.error("Error saving menu:", err);
-            throw new Error("Failed to save menu.");
+            throw new Error("Nije moguće spremiti meni.");
         }
     },
 
@@ -86,7 +86,7 @@ module.exports = {
             );
         } catch (err) {
             console.error("Error deactivating menu:", err);
-            throw new Error("Failed to deactivate menu.");
+            throw new Error("Nije moguće deaktivirati meni.");
         }
     },
 
@@ -117,7 +117,7 @@ module.exports = {
             await MenuItem.destroy({ where: { is_active: false } });
         } catch (err) {
             console.error("Error deleting inactive menu items:", err);
-            throw new Error("Failed to delete inactive menu items.");
+            throw new Error("Nije moguće obrisati neaktivne stavke menija.");
         }
     }
 

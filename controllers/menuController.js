@@ -8,7 +8,7 @@ module.exports = {
             res.render("canteen/menu", { menu, tags, error: null });
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load menu.' });
+            res.status(500).render('error', { message: 'Došlo je do greške pri učitavanju menija.' });
         }
     },
 
@@ -45,7 +45,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load menu page.' });
+            res.status(500).render('error', { message: 'Došlo je do greške pri učitavanju stranice menija.' });
         }
     },
 
@@ -67,7 +67,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to add item to cart.' });
+            res.status(500).render('error', { message: 'Došlo je do greške pri dodavanju proizvoda u korpu.' });
         }
     },
 
@@ -87,7 +87,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to remove item from cart.' });
+            res.status(500).render('error', { message: 'Došlo je do greške pri uklanjanju proizvoda iz korpe.' });
         }
     },
 
@@ -110,7 +110,7 @@ module.exports = {
             res.redirect("/user/orders");
 
         } catch (error) {
-            console.error("Error placing order:", error);
+            console.error("Greška pri kreiranju narudžbe", error);
 
             try {
                 let order = req.query.order;
@@ -140,7 +140,7 @@ module.exports = {
                 });
             } catch (innerErr) {
                 console.error(innerErr);
-                return res.status(500).render('error', { message: 'Failed to process order.' });
+                return res.status(500).render('error', { message: 'Greška pri obradi narudžbe.' });
             }
         }
     },
@@ -153,7 +153,7 @@ module.exports = {
             res.render("user/orders", { orders, error: null, user});
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load orders.' });
+            res.status(500).render('error', { message: 'Neuspjelo učitavanje narudžbi.' });
         }
     },
 
@@ -164,7 +164,7 @@ module.exports = {
 
             const order = await orderService.getOrderById(orderId);
             if (!order || order.user_id !== userId) {
-                return res.status(403).render('error', { message: 'Unauthorized to delete this order.' });
+                return res.status(403).render('error', { message: 'Nemate ovlasti za brisanje ove narudžbe.' });
             }
 
             await orderService.deleteOrder(orderId);
@@ -172,7 +172,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to delete order.' });
+            res.status(500).render('error', { message: 'Neuspjelo brisanje narudžbe.' });
         }
     }
 };

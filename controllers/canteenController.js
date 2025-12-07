@@ -12,7 +12,7 @@ module.exports = {
             res.render('canteen/dashboard', { user });
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load dashboard.' });
+            res.status(500).render('error', { message: 'Greška pri učitavanju početne stranice.' });
         }
     },
 
@@ -31,14 +31,14 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load orders.' });
+            res.status(500).render('error', { message: 'Neuspješno učitavanje narudžbi.' });
         }
     },
 
     async createMenu(req, res) {
         try {
             if (!req.body.items || !Array.isArray(req.body.items) || req.body.items.length === 0) {
-                return res.render('canteen/menu', { error: 'Menu must contain at least one item.', items: [] });
+                return res.render('canteen/menu', { error: 'Meni mora sadržavati barem jednu stavku.', items: [] });
             }
 
             const items = req.body.items;
@@ -55,7 +55,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to create menu.' });
+            res.status(500).render('error', { message: 'Neuspješno kreiranje menija.' });
         }
     },
 
@@ -65,7 +65,7 @@ module.exports = {
             res.redirect("/canteen/menu");
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to deactivate menu.' });
+            res.status(500).render('error', { message: 'Neuspješno deaktiviranje menija.' });
         }
     }
 };

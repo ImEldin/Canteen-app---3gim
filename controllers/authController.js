@@ -7,7 +7,7 @@ module.exports = {
             res.render('login', { error: null });
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load login page.' });
+            res.status(500).render('error', { message: 'Neuspješno učitavanje stranice za prijavu.' });
         }
     },
 
@@ -47,7 +47,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to login. Please try again later.' });
+            res.status(500).render('error', { message: 'Neuspješna prijava. Pokušajte ponovo kasnije.' });
         }
     },
 
@@ -69,7 +69,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            return res.status(500).render('error', { message: 'Failed to start Microsoft login.' });
+            return res.status(500).render('error', { message: 'Neuspješno pokretanje Microsoft prijave.' });
         }
     },
 
@@ -79,17 +79,17 @@ module.exports = {
 
             if (error) {
                 console.error('Microsoft OAuth error:', error, error_description);
-                return res.render('login', { error: 'Microsoft login failed. Please try again.' });
+                return res.render('login', { error: 'Microsoft prijava nije uspjela. Pokušajte ponovo.' });
             }
 
             if (!code) {
-                return res.render('login', { error: 'Invalid login response from Microsoft.' });
+                return res.render('login', { error: 'Microsoft prijava je vratila neispravan odgovor.' });
             }
 
             const result = await authService.microsoftLogin(code);
 
             if (!result.success) {
-                return res.render('login', { error: result.message || 'Microsoft login failed.' });
+                return res.render('login', { error: result.message || 'Microsoft prijava nije uspjela.' });
             }
 
             const user = result.user;
@@ -111,7 +111,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            return res.status(500).render('error', { message: 'Microsoft login failed. Please try again later.' });
+            return res.status(500).render('error', { message: 'Microsoft prijava nije uspjela. Pokušajte ponovo kasnije.' });
         }
     },
 
@@ -121,7 +121,7 @@ module.exports = {
             res.render('change-password', { error: null });
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to load change password page.' });
+            res.status(500).render('error', { message: 'Neuspješno učitavanje stranice za promjenu šifre.' });
         }
     },
 
@@ -148,7 +148,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to change password. Please try again later.' });
+            res.status(500).render('error', { message: 'Neuspješna promjena šifre. Pokušajte ponovo kasnije.' });
         }
     },
 
@@ -159,7 +159,7 @@ module.exports = {
             });
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Failed to logout.' });
+            res.status(500).render('error', { message: 'Neuspješno odjavljivanje.' });
         }
     }
 };

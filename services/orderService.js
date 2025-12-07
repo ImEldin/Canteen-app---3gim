@@ -5,28 +5,28 @@ const util = require("util");
 module.exports = {
     async placeOrder(userId, cart, pickup = {}) {
         try {
-            if (!cart || cart.length === 0) throw new Error("Cart is empty.");
+            if (!cart || cart.length === 0) throw new Error("Korpa je prazna.");
 
             const { break_slot, pickup_time } = pickup;
 
             if (break_slot && pickup_time) {
-                throw new Error("Please select either a break slot or a specific pickup time, not both.");
+                throw new Error("Odaberite ili jedan od dva odmora ili tačan termin preuzimanja, ne oboje.");
             }
 
-            if(break_slot === null && pickup_time === null) {
-                throw new Error("Please select a break slot or a specific pickup time.");
+            if (break_slot === null && pickup_time === null) {
+                throw new Error("Morate izabrati odmor ili tačan termin preuzimanja.");
             }
 
             if (break_slot) {
                 if (!["first_break", "second_break"].includes(break_slot)) {
-                    throw new Error("Invalid break slot.");
+                    throw new Error("Izabrani odmor nije validan.");
                 }
             }
 
             if (pickup_time) {
                 const [hour, minute] = pickup_time.split(":").map(Number);
                 if (hour < 9 || hour > 15 || (hour === 15 && minute > 0)) {
-                    throw new Error("Pickup time must be between 09:00 and 15:00.");
+                    throw new Error("Vrijeme preuzimanja mora biti između 09:00 i 15:00.");
                 }
 
                 const now = new Date();
@@ -36,14 +36,14 @@ module.exports = {
                 pickupDate.setHours(hour, minute, 0, 0);
 
                 if (pickupDate < thirtyMinFromNow) {
-                    throw new Error("Pickup time must be at least 30 minutes from now.");
+                    throw new Error("Vrijeme preuzimanja mora biti najmanje 30 minuta od trenutka narudžbe.");
                 }
             }
 
             return await orderRepository.createOrder(userId, cart, pickup);
         } catch (err) {
-            console.error(`Error placing order for user ${userId}:`, err);
-            throw new Error(err.message || "Failed to place order.");
+            console.error(`Error creating order for user ${userId}:`, err);
+            throw new Error(err.message || "Narudžbu nije moguće kreirati.");
         }
     },
 
@@ -52,7 +52,7 @@ module.exports = {
             return await orderRepository.getUserOrders(userId);
         } catch (err) {
             console.error(`Error fetching orders for user ${userId}:`, err);
-            throw new Error("Failed to fetch user orders.");
+            throw new Error("Nije moguće dohvatiti narudžbe korisnika.");
         }
     },
 
@@ -61,7 +61,7 @@ module.exports = {
             return await orderRepository.getOrderById(orderId);
         } catch (err) {
             console.error(`Error fetching order ${orderId}:`, err);
-            throw new Error("Failed to fetch order.");
+            throw new Error("Nije moguće dohvatiti narudžbu.");
         }
     },
 
@@ -70,7 +70,7 @@ module.exports = {
             return await orderRepository.deleteOrder(orderId);
         } catch (err) {
             console.error(`Error deleting order ${orderId}:`, err);
-            throw new Error("Failed to delete order.");
+            throw new Error("Nije moguće obrisati narudžbu.");
         }
     },
 
@@ -112,7 +112,7 @@ module.exports = {
             return await orderRepository.getAllOrders(where, userWhere, orderBy);
         } catch (err) {
             console.error("Error fetching all orders:", err);
-            throw new Error("Failed to fetch orders.");
+            throw new Error("Nije moguće dohvatiti narudžbe.");
         }
     }
 };

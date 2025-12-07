@@ -4,7 +4,7 @@ module.exports = {
     async createOrder(userId, items, pickup) {
         try {
             if (!items || !Array.isArray(items) || items.length === 0) {
-                throw new Error("Order must contain at least one item.");
+                throw new Error("Narudžba mora sadržavati barem jednu stavku.");
             }
 
             let totalAmount = 0;
@@ -33,7 +33,7 @@ module.exports = {
 
         } catch (err) {
             console.error("Error creating order:", err);
-            throw new Error("Failed to create order.");
+            throw new Error("Nije moguće kreirati narudžbu.");
         }
     },
 
@@ -56,7 +56,7 @@ module.exports = {
             });
         } catch (err) {
             console.error(`Error fetching orders for user ${userId}:`, err);
-            throw new Error("Failed to fetch user orders.");
+            throw new Error("Nije moguće dohvatiti narudžbe korisnika.");
         }
     },
 
@@ -65,7 +65,7 @@ module.exports = {
             return await Order.findByPk(orderId);
         } catch (err) {
             console.error(`Error fetching order ${orderId}:`, err);
-            throw new Error("Failed to fetch order.");
+            throw new Error("Nije moguće dohvatiti narudžbu.");
         }
     },
 
@@ -74,7 +74,7 @@ module.exports = {
             return await Order.destroy({ where: { id } });
         } catch (err) {
             console.error(`Error deleting order ${id}:`, err);
-            throw new Error("Failed to delete order.");
+            throw new Error("Nije moguće obrisati narudžbu.");
         }
     },
 
@@ -83,7 +83,7 @@ module.exports = {
             await Order.destroy({ where: {} });
         } catch (err) {
             console.error("Error deleting all orders:", err);
-            throw new Error("Failed to delete all orders.");
+            throw new Error("Nije moguće obrisati sve narudžbe.");
         }
     },
 
@@ -117,7 +117,7 @@ module.exports = {
 
         } catch (err) {
             console.error("Error fetching all orders:", err);
-            throw new Error("Failed to fetch orders.");
+            throw new Error("Nije moguće dohvatiti narudžbe.");
         }
     }
 };
