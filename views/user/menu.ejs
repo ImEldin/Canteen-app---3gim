@@ -1,126 +1,186 @@
-<h1>Menu</h1>
-
-<div>
-    <form action="/user/menu" method="GET" style="margin-bottom:20px;">
-
-        <input type="text" name="name"
-               value="<%= filters?.name || '' %>"
-               placeholder="Search by name">
-
-        <select name="tag" class="form-select">
-            <option value="">All tags</option>
-
-            <% tags.forEach(t => { %>
-                <option value="<%= t.name %>"
-                        <%= filters.tag === t.name ? "selected" : "" %>>
-                    <%= t.name %>
-                </option>
-            <% }) %>
-        </select>
-
-        <select name="order">
-            <option value="">No ordering</option>
-
-            <option value="price_asc"
-                    <%= filters?.order === "price_asc" ? "selected" : "" %>>
-                Price: Low → High
-            </option>
-
-            <option value="price_desc"
-                    <%= filters?.order === "price_desc" ? "selected" : "" %>>
-                Price: High → Low
-            </option>
-        </select>
-
-        <button type="submit">Filter</button>
-        <a href="/user/menu">
-            <button type="button">Clear Filters</button>
-        </a>
-    </form>
-    <h2>Items</h2>
-
-    <ul>
-        <% menu.forEach(item => { %>
-            <li style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                <img
-                        src="<%= item.image_url %>"
-                        alt="menu image"
-                        style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;"
-                >
-                <span>
-                <strong><%= item.name %></strong> - <%= item.price %> KM
-            </span>
-                <a href="/user/menu/add/<%= item.id %>">Add</a>
-            </li>
-        <% }) %>
-    </ul>
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meni - Kantina</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/stylesheets/user/userBody.css">
+    <link rel="stylesheet" href="/stylesheets/user/userTopBar.css">
+    <link rel="stylesheet" href="/stylesheets/loadingSpinner.css">
+    <link rel="stylesheet" href="/stylesheets/user/menu.css">
+</head>
+<body>
+<div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
 </div>
 
-<hr>
+<div id="bg-fixed"></div>
 
-<div>
-    <% if (typeof error !== "undefined") { %>
-        <div class="alert alert-danger">
+<div class="top-bar">
+    <div class="admin-info">
+        <div class="admin-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+        <span class="admin-name"><%= user.username %></span>
+    </div>
+    <div class="nav-actions">
+        <a href="/user" class="back-btn">Korisnički panel</a>
+        <a href="/auth/logout" class="logout-btn">Odjavi se</a>
+    </div>
+</div>
+
+<div class="menu-container">
+    <div class="page-header">
+        <h1 class="page-title">Današnji meni</h1>
+        <a href="/user/orders" class="back-btn">
+            Moje narudžbe
+        </a>
+    </div>
+
+    <div class="filters-card">
+        <form id="filterForm" class="filters-form" method="GET" action="/user/menu" autocomplete="off">
+            <div class="filter-group">
+                <div class="search-input-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" name="name" class="search-input" placeholder="Pretraži po nazivu..." value="<%= filters?.name || '' %>">
+                </div>
+
+                <div class="custom-select-wrapper">
+                    <div class="custom-select" id="tagSelect">
+                        <span class="selected-text">Sve kategorije</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="custom-options" id="tagOptions">
+                        <div class="custom-option" data-value="">Sve kategorije</div>
+                        <% tags.forEach(t => { %>
+                            <div class="custom-option" data-value="<%= t.name %>"><%= t.name %></div>
+                        <% }) %>
+                    </div>
+                    <input type="hidden" name="tag" id="tagInput" value="<%= filters?.tag || '' %>">
+                </div>
+
+                <div class="custom-select-wrapper">
+                    <div class="custom-select" id="orderSelect">
+                        <span class="selected-text">Sortiraj po</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="custom-options" id="orderOptions">
+                        <div class="custom-option" data-value="">Podrazumijevano</div>
+                        <div class="custom-option" data-value="price_asc">Cijena: niža → viša</div>
+                        <div class="custom-option" data-value="price_desc">Cijena: viša → niža</div>
+                    </div>
+                    <input type="hidden" name="order" id="orderInput" value="<%= filters?.order || '' %>">
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn-filter"><i class="bi bi-funnel-fill"></i> Filter</button>
+                <a href="/user/menu" class="btn-clear">Poništi</a>
+            </div>
+        </form>
+    </div>
+
+    <% if (typeof error !== "undefined" && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <%= error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zatvori"></button>
         </div>
     <% } %>
-    <h2>Your Cart</h2>
 
-    <% if (cart.length === 0) { %>
-        <p>Cart is empty</p>
-    <% } else { %>
-        <ul>
-            <% cart.forEach(c => { %>
-                <li>
-                    <%= c.name %> — <%= c.quantity %> × <%= c.price %> KM
-                    <a href="/user/menu/remove/<%= c.id %>">Remove</a>
-                </li>
-            <% }) %>
-        </ul>
+    <div class="menu-layout">
+        <div class="menu-items-grid">
+            <% if (menu.length > 0) { %>
+                <% menu.forEach(function(item) { %>
+                    <div class="menu-item-card">
+                        <div class="item-image-container">
+                            <img src="<%= item.image_url %>" alt="<%= item.name %>" class="item-image" onerror="this.onerror=null;this.src='/images/default-food.png'; this.classList.add('is-default');">
+                        </div>
+                        <div class="item-details">
+                            <h3 class="item-name"><%= item.name %></h3>
+                            <p class="item-price"><%= item.price %> KM</p>
+                            <a href="/user/menu/add/<%= item.id %>" class="btn-add-cart">
+                                <i class="fas fa-cart-plus"></i> Dodaj u korpu
+                            </a>
+                        </div>
+                    </div>
 
-        <h3>Total: <%= total.toFixed(2) %> KM</h3>
+                <% }); %>
+            <% } else { %>
+                <p class="no-results">Nema stavki koje odgovaraju vašoj pretrazi.</p>
+            <% } %>
+        </div>
 
-        <form action="/user/menu/confirm" method="POST">
-            <h3>Pickup Option</h3>
+        <div class="cart-sidebar">
+            <div class="cart-card">
+                <h2 class="cart-title">Vaša korpa</h2>
 
-            <label>
-                <input type="radio" name="pickupMode" value="break" onclick="enableBreak()">
-                Choose Big Break
-            </label>
+                <% if (!cart || cart.length === 0) { %>
+                    <div class="empty-cart">
+                        <i class="bi bi-cart-x"></i>
+                        <p>Korpa je prazna</p>
+                    </div>
+                <% } else { %>
 
-            <select name="break_slot" id="break_slot" disabled>
-                <option value="">-- Select break --</option>
-                <option value="first_break">First Break</option>
-                <option value="second_break">Second Break</option>
-            </select>
+                    <ul class="cart-items-list">
+                        <% cart.forEach(function(c) { %>
+                            <li class="cart-item">
+                                <span class="cart-item-name"><%= c.name %> (<%= c.quantity %>x)</span>
+                                <div class="cart-item-details">
+                                    <span class="cart-item-price"><%= (c.price * c.quantity).toFixed(2) %> KM</span>
+                                    <a href="/user/menu/remove/<%= c.id %>" class="cart-item-remove" title="Ukloni"><i class="fas fa-times"></i></a>
+                                </div>
+                            </li>
+                        <% }); %>
+                    </ul>
 
-            <label>
-                <input type="radio" name="pickupMode" value="time" onclick="enableTime()">
-                Choose Specific Time
-            </label>
+                    <div class="cart-total">
+                        <span>Ukupno:</span>
+                        <span><%= total.toFixed(2) %> KM</span>
+                    </div>
 
-            <input type="time" name="pickup_time" id="pickup_time" min="09:00" max="15:00" disabled>
+                    <form action="/user/menu/confirm" method="POST" class="order-form">
+                        <h3 class="pickup-title">Opcija preuzimanja</h3>
 
-            <button type="submit">Confirm Order</button>
-        </form>
-    <% } %>
+                        <div class="pickup-options">
+                            <div class="radio-group">
+                                <input type="radio" id="pickup_break" name="pickupMode" value="break" onclick="enableBreak()">
+                                <label for="pickup_break">Preuzimanje na odmoru</label>
+                            </div>
+
+                            <div class="radio-group">
+                                <input type="radio" id="pickup_time_radio" name="pickupMode" value="time" onclick="enableTime()">
+                                <label for="pickup_time_radio">Odaberi vrijeme</label>
+                            </div>
+                        </div>
+
+                        <div id="break_select_wrapper" class="custom-select-wrapper" style="display: none;">
+                            <div class="custom-select" id="breakSlotSelect">
+                                <span class="selected-text">Odaberi odmor</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </div>
+                            <div class="custom-options" id="breakSlotOptions">
+                                <div class="custom-option" data-value="first_break">Prvi odmor (9:30)</div>
+                                <div class="custom-option" data-value="second_break">Drugi odmor (11:15)</div>
+                            </div>
+                            <input type="hidden" name="break_slot" id="break_slot">
+                        </div>
+
+                        <input type="time" name="pickup_time" id="pickup_time" class="form-control" min="09:00" max="15:00" style="display: none;">
+
+                        <button type="submit" class="btn-confirm-order">Potvrdi narudžbu</button>
+                    </form>
+                <% } %>
+            </div>
+        </div>
+    </div>
 </div>
 
-<hr>
-
-<a href="/user/orders">View My Orders</a> |
-<a href="/user">Back</a>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/javascripts/user/menu.js"></script>
 <script>
-    function enableBreak() {
-        document.getElementById("break_slot").disabled = false;
-        document.getElementById("pickup_time").disabled = true;
-        document.getElementById("pickup_time").value = "";
-    }
-
-    function enableTime() {
-        document.getElementById("pickup_time").disabled = false;
-        document.getElementById("break_slot").disabled = true;
-        document.getElementById("break_slot").value = "";
-    }
+    window.addEventListener('load', function() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+    });
 </script>
+</body>
+</html>

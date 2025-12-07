@@ -15,6 +15,7 @@ module.exports = {
     async showMenu(req, res) {
         try {
             let order = req.query.order;
+            const user = req.session.user;
             let orderBy = null;
 
             if(order === "price_asc") orderBy = [["price", "ASC"]];
@@ -38,7 +39,8 @@ module.exports = {
                 total,
                 filters,
                 tags,
-                error: null
+                error: null,
+                user
             });
 
         } catch (err) {
@@ -112,6 +114,7 @@ module.exports = {
 
             try {
                 let order = req.query.order;
+                const user = req.session.user;
                 let orderBy = null;
                 if (order === "price_asc") orderBy = [["price", "ASC"]];
                 else if (order === "price_desc") orderBy = [["price", "DESC"]];
@@ -132,7 +135,8 @@ module.exports = {
                     total,
                     filters,
                     tags,
-                    error: error.message
+                    error: error.message,
+                    user
                 });
             } catch (innerErr) {
                 console.error(innerErr);

@@ -13,6 +13,10 @@ module.exports = {
                 throw new Error("Please select either a break slot or a specific pickup time, not both.");
             }
 
+            if(break_slot === null && pickup_time === null) {
+                throw new Error("Please select a break slot or a specific pickup time.");
+            }
+
             if (break_slot) {
                 if (!["first_break", "second_break"].includes(break_slot)) {
                     throw new Error("Invalid break slot.");
