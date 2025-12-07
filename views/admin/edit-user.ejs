@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uredi korisnika - <%= user.username %></title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/stylesheets/admin/adminBody.css">
+    <link rel="stylesheet" href="/stylesheets/admin/adminTopBar.css">
+    <link rel="stylesheet" href="/stylesheets/loadingSpinner.css">
+    <link rel="stylesheet" href="/stylesheets/admin/editUser.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+</div>
+
+<div id="bg-fixed"></div>
+
+<div class="top-bar">
+    <div class="admin-info">
+        <div class="admin-avatar"><%= admin.username.charAt(0).toUpperCase() %></div>
+        <span class="admin-name"><%= admin.username %></span>
+    </div>
+
+    <div class="nav-actions">
+        <a href="/admin" class="back-btn">Admin panel</a>
+        <a href="/auth/logout" class="logout-btn">Odjava</a>
+    </div>
+</div>
+
+<div class="content-wrapper">
+    <div class="form-container">
+        <div class="form-card">
+            <h1 class="form-title">Uredi korisnika</h1>
+
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-danger alert-dismissible fade show custom-alert" role="alert">
+                    <div class="alert-content">
+                        <strong>Greška!</strong> <%= error %>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zatvori"></button>
+                </div>
+            <% } %>
+
+            <form action="/admin/user/edit/<%= user.id %>" method="POST">
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email adresa</label>
+                    <input type="email" id="email" name="email" class="form-control" value="<%= user.email %>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">Korisničko ime</label>
+                    <input type="text" id="username" name="username" class="form-control" value="<%= user.username %>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="phone_number" class="form-label">Broj telefona</label>
+                    <input type="text" id="phone_number" name="phone_number" class="form-control" value="<%= user.phone_number || '' %>">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Uloga</label>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select" id="roleSelect">
+                            <span class="selected-text">
+                                <%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %>
+                            </span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+
+                        <div class="custom-options" id="roleOptions">
+                            <% const allRoles = ["ucenik", "profesor", "kantina"]; %>
+                            <% allRoles.forEach(r => { %>
+                                <div class="custom-option" data-value="<%= r %>">
+                                    <%= r.charAt(0).toUpperCase() + r.slice(1) %>
+                                </div>
+                            <% }) %>
+                        </div>
+
+                        <input type="hidden" name="role" id="roleInput" value="<%= user.role %>" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/admin/user/<%= user.id %>" class="btn btn-cancel">Nazad</a>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Sačuvaj promjene
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('load', function() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+    });
+</script>
+
+<script type="text/javascript" src="/javascripts/admin/editUser.js"></script>
+
+</body>
+</html>

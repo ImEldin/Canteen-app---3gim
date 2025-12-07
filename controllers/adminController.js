@@ -99,11 +99,12 @@ module.exports = {
     async showEditUser(req, res) {
         try {
             const userId = req.params.id;
+            const admin = req.session.user;
             const user = await adminService.getUserDetails(userId);
 
             if (!user) return res.status(404).render('error', { message: 'User not found.' });
 
-            res.render('admin/editUser', { user, error: null });
+            res.render('admin/edit-User', { user, error: null, admin});
 
         } catch (err) {
             console.error(err);
@@ -130,10 +131,10 @@ module.exports = {
 
             if (result && !result.success) {
                 const user = await adminService.getUserDetails(userId);
-                return res.render('admin/editUser', { user, error: result.message });
+                return res.render('admin/edit-user', { user, error: result.message });
             }
 
-            res.redirect(`/admin/user/${userId}`);
+            res.redirect(`/admin/user/${userId}?success=Korisnik je uspješno izmjenjen.`);
 
         } catch (err) {
             console.error(err);
