@@ -213,7 +213,7 @@
 
 .empty-cart {
     text-align: center;
-    padding: 58px 0;
+    padding: 59px 0;
     color: var(--text-gray);
 }
 
@@ -425,7 +425,6 @@
 .btn-close:hover {
     opacity: 1;
 }
-
 
 .back-to-dash {
     display: flex;

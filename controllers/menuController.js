@@ -148,8 +148,9 @@ module.exports = {
     async showOrders(req, res) {
         try {
             const userId = req.session.user.id;
+            const user = req.session.user;
             const orders = await orderService.userOrders(userId);
-            res.render("user/orders", { orders, error: null });
+            res.render("user/orders", { orders, error: null, user});
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Failed to load orders.' });
