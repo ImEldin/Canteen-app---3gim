@@ -1,3 +1,32 @@
-<% if (message) { %>
-    <h1><%= message %></h1>
-<% } %>
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greška - Kantina</title>
+    <link rel="stylesheet" href="/stylesheets/user/userBody.css">
+    <link rel="stylesheet" href="/stylesheets/error.css">
+</head>
+<body>
+<div id="bg-fixed"></div>
+
+<div class="error-container">
+    <div class="error-card">
+        <% if (error && error.status) { %>
+            <h1 class="error-status"><%= error.status %></h1>
+        <% } %>
+        <h2 class="error-message"><%= message %></h2>
+        <p class="error-description">Došlo je do neočekivane greške. Molimo pokušajte ponovo kasnije ili se vratite na početnu stranicu.</p>
+
+        <% if (process.env.NODE_ENV === 'development' && error && error.stack) { %>
+            <div class="error-stack-container">
+                <pre class="error-stack"><%= error.stack %></pre>
+            </div>
+        <% } %>
+
+        <a href="/" class="btn-home">Vrati se na početnu</a>
+    </div>
+</div>
+
+</body>
+</html>
