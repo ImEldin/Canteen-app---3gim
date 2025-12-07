@@ -52,12 +52,13 @@ module.exports = {
 
     async userDetails(req, res) {
         try {
+            const admin = req.session.user;
             const id = req.params.id;
             const user = await adminService.getUserDetails(id);
 
             if (!user) return res.status(404).render('error', { message: 'User not found.' });
 
-            res.render('admin/user-details', { user });
+            res.render('admin/user-details', { user, admin });
 
         } catch (err) {
             console.error(err);

@@ -1,51 +1,189 @@
-<h1>User Details</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details - <%= user.username %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/stylesheets/admin/adminBody.css">
+    <link rel="stylesheet" href="/stylesheets/admin/adminTopBar.css">
+    <link rel="stylesheet" href="/stylesheets/loadingSpinner.css">
+    <link rel="stylesheet" href="/stylesheets/admin/userDetails.css">
+</head>
+<body>
+<div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+</div>
 
-<h2>General Info</h2>
-<p>Email: <%= user.email %></p>
-<p>Username: <%= user.username %></p>
-<p>Phone: <%= user.phone_number %></p>
-<p>Role: <%= user.role %></p>
-<a href="/admin/user/edit/<%= user.id %>">Edit User</a>
+<div id="bg-fixed"></div>
 
-<h2>Security Info</h2>
-<p>Active: <%= user.is_active %></p>
-<p>Locked: <%= user.is_locked %></p>
-<p>Failed Attempts: <%= user.failed_login_attempts %></p>
-<p>Locked Until: <%= user.locked_until %></p>
-<p>Must Change Password: <%= user.must_change_password %></p>
-<p>Last Login: <%= user.last_login_at %></p>
+<div class="top-bar">
+    <div class="admin-info">
+        <div class="admin-avatar"><%= admin.username.charAt(0).toUpperCase() %></div>
+        <span class="admin-name"><%= admin.username %></span>
+    </div>
+    <div class="nav-actions">
+        <a href="/admin" class="back-btn">Admin Panel</a>
+        <a href="/auth/logout" class="logout-btn">Logout</a>
+    </div>
+</div>
 
-<h2>Timestamps</h2>
-<p>Created: <%= user.created_at %></p>
-<p>Updated: <%= user.updated_at %></p>
+<div class="user-details-container">
+    <div class="header-card">
+        <div class="page-header">
+            <h1 class="page-title">User Details</h1>
+            <a href="/admin/manage-users" class="back-btn">
+                <span>Back to Users</span>
+            </a>
+        </div>
+    </div>
 
-<hr>
+    <div class="details-grid">
+        <div class="details-card">
+            <div class="card-header">
+                <h2>General Information</h2>
+                <a href="/admin/user/edit/<%= user.id %>" class="edit-btn">
+                    <i class="fas fa-pencil-alt"></i> Uredi
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value"><%= user.email || 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Username</span>
+                        <span class="info-value"><%= user.username || 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Phone</span>
+                        <span class="info-value"><%= user.phone_number || 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Role</span>
+                        <span class="info-value">
+                            <span class="role-badge <%= user.role %>"><%= user.role %></span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Login</span>
+                        <span class="info-value"><%= user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Never' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Joined</span>
+                        <span class="info-value"><%= new Date(user.created_at).toLocaleDateString() %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<h2>Actions</h2>
+        <div class="details-card">
+            <div class="card-header">
+                <h2>Security Status</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Account Status</span>
+                        <span class="info-value">
+                            <% if (user.banned) { %>
+                                <span class="status-badge banned">Banned</span>
+                            <% } else if (user.is_active) { %>
+                                <span class="status-badge active">Active</span>
+                            <% } else { %>
+                                <span class="status-badge inactive">Inactive</span>
+                            <% } %>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Lock Status</span>
+                        <span class="info-value">
+                            <% if (user.is_locked) { %>
+                                <span class="status-badge banned">Locked</span>
+                            <% } else { %>
+                                <span class="status-badge active">Unlocked</span>
+                            <% } %>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Locked Until</span>
+                        <span class="info-value"><%= user.locked_until ? new Date(user.locked_until).toLocaleString() : 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Failed Logins</span>
+                        <span class="info-value"><%= user.failed_login_attempts %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Password Change</span>
+                        <span class="info-value"><%= user.must_change_password ? 'Required' : 'Not Required' %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<form method="POST" action="/admin/lock/<%= user.id %>">
-    <input name="minutes" type="number" required>
-    <button>Lock</button>
-</form>
+    <div class="details-card">
+        <div class="card-header">
+            <h2>Manage User</h2>
+        </div>
+        <div class="card-body">
+            <div class="actions-grid">
+                <form method="POST" action="/admin/lock/<%= user.id %>" class="action-form">
+                    <label for="lock-minutes">Lock Duration (minutes)</label>
+                    <div class="input-group">
+                        <input id="lock-minutes" name="minutes" type="number" placeholder="e.g., 60" required>
+                        <button type="submit" class="btn-action btn-warning">
+                            <i class="fas fa-lock"></i> Lock
+                        </button>
+                    </div>
+                </form>
 
-<form method="POST" action="/admin/unlock/<%= user.id %>">
-    <button>Unlock</button>
-</form>
+                <form method="POST" action="/admin/unlock/<%= user.id %>" class="action-form">
+                    <p>Remove temporary lock from the user's account.</p>
+                    <button type="submit" class="btn-action btn-success" <% if (!user.is_locked) { %> disabled <% } %>>
+                        <i class="fas fa-unlock"></i> Unlock
+                    </button>
+                </form>
 
-<form method="POST" action="/admin/ban/<%= user.id %>">
-    <button <% if (user.banned) { %> disabled <% } %> >Ban</button>
-</form>
+                <% if (user.banned) { %>
+                    <form method="POST" action="/admin/unban/<%= user.id %>" class="action-form">
+                        <p>Reinstate a banned user's account access.</p>
+                        <button type="submit" class="btn-action btn-success">
+                            <i class="fas fa-check-circle"></i> Unban
+                        </button>
+                    </form>
+                <% } else { %>
+                    <form method="POST" action="/admin/ban/<%= user.id %>" class="action-form">
+                        <p>Permanently revoke access for this user.</p>
+                        <button type="submit" class="btn-action btn-danger">
+                            <i class="fas fa-ban"></i> Ban User
+                        </button>
+                    </form>
+                <% } %>
 
-<form method="POST" action="/admin/unban/<%= user.id %>">
-    <button <% if (!user.banned) { %> disabled <% } %> >Unban</button>
-</form>
+                <form method="POST" action="/admin/reset-password/<%= user.id %>" class="action-form">
+                    <p>Force user to reset their password on next login.</p>
+                    <button type="submit" class="btn-action btn-secondary">
+                        <i class="fas fa-key"></i> Reset Password
+                    </button>
+                </form>
 
-<form method="POST" action="/admin/reset-password/<%= user.id %>">
-    <button>Reset Password</button>
-</form>
+                <form method="POST" action="/admin/delete/<%= user.id %>" class="action-form" onsubmit="return confirm('Are you sure you want to permanently delete this user? This action cannot be undone.');">
+                    <p>Permanently delete this user and all their data.</p>
+                    <button type="submit" class="btn-action btn-danger">
+                        <i class="fas fa-trash-alt"></i> Delete User
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-<form method="POST" action="/admin/delete/<%= user.id %>">
-    <button>Delete User</button>
-</form>
-
-<a href="/admin/manage-users">Back</a>
+<script>
+    window.addEventListener('load', function() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+    });
+</script>
+</body>
+</html>
