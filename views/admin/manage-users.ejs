@@ -1,62 +1,149 @@
-<h1>Users</h1>
-
-<form id="filterForm" method="GET" action="/admin/manage-users">
-    <input type="text" name="email" placeholder="Email" value="<%= filters.email %>">
-    <input type="text" name="username" placeholder="Username" value="<%= filters.username %>">
-
-    <select name="role">
-        <option value="">Any role</option>
-        <option value="ucenik" <%= filters.role === 'ucenik' ? 'selected' : '' %>>Ucenik</option>
-        <option value="profesor" <%= filters.role === 'profesor' ? 'selected' : '' %>>Profesor</option>
-        <option value="kantina" <%= filters.role === 'kantina' ? 'selected' : '' %>>Kantina</option>
-        <option value="admin" <%= filters.role === 'admin' ? 'selected' : '' %>>Admin</option>
-    </select>
-
-    <select name="pageSize">
-        <option value="5" <%= pageSize == 5 ? 'selected' : '' %>>5</option>
-        <option value="10" <%= pageSize == 10 ? 'selected' : '' %>>10</option>
-        <option value="20" <%= pageSize == 20 ? 'selected' : '' %>>20</option>
-        <option value="50" <%= pageSize == 50 ? 'selected' : '' %>>50</option>
-    </select>
-
-    <button type="submit">Filter</button>
-    <button type="button" onclick="window.location='/admin/manage-users'">Clear</button>
-</form>
-
-<ul id="userList">
-    <% users.forEach(user => { %>
-        <li>
-            <strong><%= user.username %></strong>
-            ( <%= user.email %> ) -
-            <%= user.role %>
-
-            <% if (user.banned) { %>
-                <span style="color: red; font-weight: bold; margin-left: 10px;">
-                    BANNED
-                </span>
-            <% } %>
-
-            <a href="/admin/user/<%= user.id %>">View</a>
-        </li>
-    <% }) %>
-</ul>
-
-<div>
-    <% if (page > 1) { %>
-        <a href="?page=<%= page - 1 %>&pageSize=<%= pageSize %>&email=<%= filters.email %>&username=<%= filters.username %>&role=<%= filters.role %>">
-            Previous
-        </a>
-    <% } %>
-
-    <span>Page <%= page %></span>
-
-    <% if (hasMore) { %>
-        <a href="?page=<%= page + 1 %>&pageSize=<%= pageSize %>&email=<%= filters.email %>&username=<%= filters.username %>&role=<%= filters.role %>">
-            Next
-        </a>
-    <% } %>
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upravljanje Korisnicima</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/stylesheets/admin/adminBody.css">
+    <link rel="stylesheet" href="/stylesheets/admin/adminTopBar.css">
+    <link rel="stylesheet" href="/stylesheets/loadingSpinner.css">
+    <link rel="stylesheet" href="/stylesheets/admin/manageUsers.css">
+</head>
+<body>
+<div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
 </div>
 
-<a href="/admin">Back</a>
-<a href="/admin/create-user">Create New User</a>
+<div id="bg-fixed"></div>
 
+<div class="top-bar">
+    <div class="admin-info">
+        <div class="admin-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+        <span class="admin-name"><%= user.username %></span>
+    </div>
+    <div class="nav-actions">
+        <a href="/admin" class="back-btn">Admin panel</a>
+        <a href="/auth/logout" class="logout-btn">Odjavi se</a>
+    </div>
+</div>
+
+<div class="manage-users-container">
+    <div class="filters-card">
+        <form id="filterForm" class="filters-form" method="GET" action="/admin/manage-users" autocomplete="off">
+            <div class="filter-group">
+                <input type="text" name="email" id="filterEmail" placeholder="Pretraži po emailu..." value="<%= filters.email %>">
+                <input type="text" name="username" id="filterUsername" placeholder="Pretraži po imenu..." value="<%= filters.username %>">
+                <div class="custom-select-wrapper">
+                    <div class="custom-select" id="roleSelect">
+                        <span class="selected-text"><%= filters.role ? filters.role.charAt(0).toUpperCase() + filters.role.slice(1) : 'Sve uloge' %></span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="custom-options" id="roleOptions">
+                        <div class="custom-option" data-value="">Sve uloge</div>
+                        <div class="custom-option" data-value="ucenik">Učenik</div>
+                        <div class="custom-option" data-value="profesor">Profesor</div>
+                        <div class="custom-option" data-value="kantina">Kantina</div>
+                    </div>
+                    <input type="hidden" name="role" id="roleInput" value="<%= filters.role %>">
+                </div>
+                <div class="page-size-selector">
+                    <label>Prikaži:</label>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select" id="pageSizeSelect">
+                            <span class="selected-text"><%= pageSize %></span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                        <div class="custom-options" id="pageSizeOptions">
+                            <div class="custom-option" data-value="5">5</div>
+                            <div class="custom-option" data-value="10">10</div>
+                            <div class="custom-option" data-value="20">20</div>
+                            <div class="custom-option" data-value="50">50</div>
+                        </div>
+                        <input type="hidden" name="pageSize" id="pageSizeInput" value="<%= pageSize %>" form="filterForm">
+                    </div>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="btn-filter"><i class="bi bi-funnel-fill"></i> Filter</button>
+                <a href="/admin/manage-users" class="btn-clear">Očisti</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="users-table-wrapper">
+        <div class="table-header">
+            <h1>Korisnici</h1>
+            <a href="/admin/create-user" class="btn-create-user">
+                <i class="bi bi-plus-lg"></i> Kreiraj korisnika
+            </a>
+        </div>
+        <table class="users-table">
+            <thead>
+            <tr>
+                <th class="col-user">Korisnik</th>
+                <th class="col-role">Uloga</th>
+                <th class="col-status">Status</th>
+                <th class="col-actions">Akcije</th>
+            </tr>
+            </thead>
+            <tbody id="usersTableBody">
+            <% if (users.length > 0) { %>
+                <% users.forEach(function(u) { %>
+                    <tr class="user-row">
+                        <td data-label="Korisnik" class="col-user">
+                            <div class="user-info-cell">
+                                <div class="user-avatar"><%= u.username.charAt(0).toUpperCase() %></div>
+                                <div class="user-details">
+                                    <span class="user-name"><%= u.username %></span>
+                                    <span class="user-email"><%= u.email %></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Uloga" class="col-role">
+                            <span class="role-badge <%= u.role %>"><%= u.role %></span>
+                        </td>
+                        <td data-label="Status" class="col-status">
+                            <% if (u.banned) { %>
+                                <span class="status-badge banned">Banovan</span>
+                            <% } else { %>
+                                <span class="status-badge active">Aktivan</span>
+                            <% } %>
+                        </td>
+                        <td data-label="Akcije" class="col-actions">
+                            <a href="/admin/user/<%= u.id %>" class="action-btn view-btn">
+                                <i class="bi bi-pencil-square"></i> Uredi
+                            </a>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="4" class="no-results">Nema korisnika koji odgovaraju filterima.</td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-footer">
+        <nav class="pagination" aria-label="Pagination">
+            <a <% if (page > 1) { %>href="?<%= new URLSearchParams({ ...filters, pageSize, page: page - 1 }).toString() %>"<% } %> class="page-btn icon-btn <%= (page <= 1) ? 'disabled' : '' %>">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            <span class="page-info">Stranica <%= page %></span>
+            <a <% if (hasMore) { %>href="?<%= new URLSearchParams({ ...filters, pageSize, page: page + 1 }).toString() %>"<% } %> class="page-btn icon-btn <%= (!hasMore) ? 'disabled' : '' %>">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </nav>
+    </div>
+</div>
+
+<script src="/javascripts/admin/manageUsers.js"></script>
+<script>
+    window.addEventListener('load', function() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+    });
+</script>
+</body>
+</html>

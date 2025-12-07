@@ -16,6 +16,7 @@ module.exports = {
 
     async listUsers(req, res) {
         try {
+            const user = req.session.user;
             const adminId = req.session.user.id;
 
             const page = parseInt(req.query.page) || 1;
@@ -39,7 +40,8 @@ module.exports = {
                 filters,
                 page,
                 pageSize,
-                hasMore
+                hasMore,
+                user
             });
 
         } catch (err) {

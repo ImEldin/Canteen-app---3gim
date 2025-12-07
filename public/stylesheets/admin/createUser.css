@@ -234,7 +234,6 @@
 
 .custom-select-wrapper {
     position: relative;
-    z-index: 10;
 }
 
 .custom-select {
@@ -248,6 +247,8 @@
     align-items: center;
     background: var(--white);
     transition: all 0.3s ease;
+    position: relative;
+    z-index: 11;
 }
 
 .custom-select:hover {
@@ -269,13 +270,18 @@
 }
 
 .custom-options {
-    position: fixed;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
     background: var(--white);
-    border: none;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.07);
     display: none;
-    z-index: 99999;
-    clip-path: inset(0 round 12px);
+    z-index: 10;
+    overflow: hidden;
+    padding: 6px;
 }
 
 .custom-options.open {
@@ -283,10 +289,10 @@
 }
 
 .custom-option {
-    padding: 12px 16px;
+    padding: 10px 12px;
     cursor: pointer;
     transition: background 0.2s ease, color 0.2s ease;
-    background: var(--white);
+    border-radius: 8px;
 }
 
 .custom-option:hover {
