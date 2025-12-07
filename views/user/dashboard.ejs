@@ -1,17 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="bs">
 <head>
     <meta charset="UTF-8">
-    <title>User Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korisnički panel</title>
+    <link rel="stylesheet" href="/stylesheets/user/userDashboard.css">
+    <link rel="stylesheet" href="/stylesheets/loadingSpinner.css">
+    <link rel="stylesheet" href="/stylesheets/user/userTopBar.css">
+    <link rel="stylesheet" href="/stylesheets/user/userBody.css">
 </head>
 <body>
-<h2>Welcome, <%= user.username %></h2>
-<nav>
-    <ul>
-        <li><a href="/user/menu">Menu</a></li>
-        <li><a href="/user/orders">My orders</a></li>
-        <li><a href="/auth/logout">Logout</a></li>
-    </ul>
-</nav>
+<div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+</div>
+<div id="bg-fixed"></div>
+
+<div class="top-bar">
+    <div class="admin-info">
+        <div class="admin-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+        <span class="admin-name"><%= user.username %></span>
+    </div>
+    <a href="/auth/logout" class="logout-btn">Odjavi se</a>
+</div>
+
+<div class="dashboard-container">
+    <div class="cards-wrapper">
+        <a href="/user/menu" class="dashboard-card">
+            <div class="card-icon">
+                <img src="/images/menu.png" alt="Menu">
+            </div>
+            <div class="card-title">Meni</div>
+            <div class="card-description">Pogledaj dostupnu ponudu</div>
+        </a>
+        <a href="/user/orders" class="dashboard-card">
+            <div class="card-icon">
+                <img src="/images/cart.png" alt="My Orders">
+            </div>
+            <div class="card-title">Moje narudžbe</div>
+            <div class="card-description">Prikaži historiju narudžbi</div>
+        </a>
+    </div>
+</div>
 </body>
+<script>
+    window.addEventListener('load', function() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+    });
+</script>
 </html>
