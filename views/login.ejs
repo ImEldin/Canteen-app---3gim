@@ -25,9 +25,9 @@
                         <p class="subtitle">Digitalna kantina</p>
                     </div>
                     <% if (typeof error !== 'undefined' && error) { %>
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>Greška!</strong> <%= error %>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zatvori"></button>
+                        <div class="error-message">
+                            <span><strong>Greška!</strong> <%= error %></span>
+                            <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
                         </div>
                     <% } %>
                     <form action="/auth/login" method="POST">
