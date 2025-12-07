@@ -58,7 +58,12 @@ module.exports = {
 
             if (!user) return res.status(404).render('error', { message: 'User not found.' });
 
-            res.render('admin/user-details', { user, admin });
+            const successMessage = req.query.success || null;
+
+            const tempPassword = req.session.tempPassword || null;
+            delete req.session.tempPassword;
+
+            res.render('admin/user-details', { user, admin , success: successMessage, tempPassword });
 
         } catch (err) {
             console.error(err);
@@ -187,7 +192,7 @@ module.exports = {
     async lockUser(req, res) {
         try {
             await adminService.lockUser(req.params.id, req.body.minutes);
-            res.redirect('/admin/manage-users');
+            res.redirect(`/admin/user/${req.params.id}?success=Korisnik je zaključan.`);
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Failed to lock user.' });
@@ -197,7 +202,7 @@ module.exports = {
     async unlockUser(req, res) {
         try {
             await adminService.unlockUser(req.params.id);
-            res.redirect('/admin/manage-users');
+            res.redirect(`/admin/user/${req.params.id}?success=Korisnik je otključan.`);
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Failed to unlock user.' });
@@ -207,7 +212,8 @@ module.exports = {
     async resetPassword(req, res) {
         try {
             const result = await adminService.resetPassword(req.params.id);
-            res.render('admin/password-reset', { tempPassword: result.tempPassword });
+            req.session.tempPassword = result.tempPassword;
+            res.redirect(`/admin/user/${req.params.id}?success=Lozinka uspješno resetovana.`);
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Failed to reset password.' });
@@ -227,7 +233,7 @@ module.exports = {
     async banUser(req, res) {
         try {
             await adminService.banUser(req.params.id);
-            res.redirect('/admin/manage-users');
+            res.redirect(`/admin/user/${req.params.id}?success=Korisnik je deaktiviran.`);
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Failed to ban user.' });
@@ -237,7 +243,7 @@ module.exports = {
     async unbanUser(req, res) {
         try {
             await adminService.unbanUser(req.params.id);
-            res.redirect('/admin/manage-users');
+            res.redirect(`/admin/user/${req.params.id}?success=Korisnik je aktiviran.`);
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Failed to unban user.' });

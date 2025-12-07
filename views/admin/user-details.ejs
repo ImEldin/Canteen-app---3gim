@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Details - <%= user.username %></title>
+    <title>Detalji korisnika - <%= user.username %></title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="/stylesheets/admin/adminBody.css">
     <link rel="stylesheet" href="/stylesheets/admin/adminTopBar.css">
@@ -23,101 +27,137 @@
         <span class="admin-name"><%= admin.username %></span>
     </div>
     <div class="nav-actions">
-        <a href="/admin" class="back-btn">Admin Panel</a>
-        <a href="/auth/logout" class="logout-btn">Logout</a>
+        <a href="/admin" class="back-btn">Admin panel</a>
+        <a href="/auth/logout" class="logout-btn">Odjava</a>
     </div>
 </div>
 
 <div class="user-details-container">
+
     <div class="header-card">
         <div class="page-header">
-            <h1 class="page-title">User Details</h1>
+            <h1 class="page-title">Detalji korisnika</h1>
             <a href="/admin/manage-users" class="back-btn">
-                <span>Back to Users</span>
+                <span>Nazad na listu korisnika</span>
             </a>
         </div>
     </div>
 
+    <% if (success) { %>
+        <div class="alert alert-success custom-success" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+            <div class="alert-content">
+                <span><%= success %></span>
+
+                <% if (tempPassword) { %>
+                    <p class="temp-pass">
+                        Privremena lozinka: <b><%= tempPassword %></b>
+                    </p>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+
     <div class="details-grid">
         <div class="details-card">
             <div class="card-header">
-                <h2>General Information</h2>
+                <h2>Opće informacije</h2>
                 <a href="/admin/user/edit/<%= user.id %>" class="edit-btn">
                     <i class="fas fa-pencil-alt"></i> Uredi
                 </a>
             </div>
             <div class="card-body">
                 <div class="info-grid">
+
                     <div class="info-item">
-                        <span class="info-label">Email</span>
-                        <span class="info-value"><%= user.email || 'N/A' %></span>
+                        <span class="info-label">Email adresa</span>
+                        <span class="info-value"><%= user.email || 'Nije dostupno' %></span>
                     </div>
+
                     <div class="info-item">
-                        <span class="info-label">Username</span>
-                        <span class="info-value"><%= user.username || 'N/A' %></span>
+                        <span class="info-label">Korisničko ime</span>
+                        <span class="info-value"><%= user.username || 'Nije dostupno' %></span>
                     </div>
+
                     <div class="info-item">
-                        <span class="info-label">Phone</span>
-                        <span class="info-value"><%= user.phone_number || 'N/A' %></span>
+                        <span class="info-label">Broj telefona</span>
+                        <span class="info-value"><%= user.phone_number || 'Nije dostupno' %></span>
                     </div>
+
                     <div class="info-item">
-                        <span class="info-label">Role</span>
+                        <span class="info-label">Uloga</span>
                         <span class="info-value">
                             <span class="role-badge <%= user.role %>"><%= user.role %></span>
                         </span>
                     </div>
+
                     <div class="info-item">
-                        <span class="info-label">Last Login</span>
-                        <span class="info-value"><%= user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Never' %></span>
+                        <span class="info-label">Posljednja prijava</span>
+                        <span class="info-value">
+                            <%= user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Nikada' %>
+                        </span>
                     </div>
+
                     <div class="info-item">
-                        <span class="info-label">Joined</span>
+                        <span class="info-label">Profil kreiran</span>
                         <span class="info-value"><%= new Date(user.created_at).toLocaleDateString() %></span>
                     </div>
+
                 </div>
             </div>
         </div>
 
         <div class="details-card">
             <div class="card-header">
-                <h2>Security Status</h2>
+                <h2>Sigurnosti</h2>
             </div>
             <div class="card-body">
                 <div class="info-grid">
+
                     <div class="info-item">
-                        <span class="info-label">Account Status</span>
+                        <span class="info-label">Status računa</span>
                         <span class="info-value">
                             <% if (user.banned) { %>
-                                <span class="status-badge banned">Banned</span>
+                                <span class="status-badge banned">Suspendovan</span>
                             <% } else if (user.is_active) { %>
-                                <span class="status-badge active">Active</span>
+                                <span class="status-badge active">Aktivan</span>
                             <% } else { %>
-                                <span class="status-badge inactive">Inactive</span>
+                                <span class="status-badge inactive">Neaktivan</span>
                             <% } %>
                         </span>
                     </div>
+
                     <div class="info-item">
-                        <span class="info-label">Lock Status</span>
+                        <span class="info-label">Zaključavanje</span>
                         <span class="info-value">
                             <% if (user.is_locked) { %>
-                                <span class="status-badge banned">Locked</span>
+                                <span class="status-badge banned">Zaključan</span>
                             <% } else { %>
-                                <span class="status-badge active">Unlocked</span>
+                                <span class="status-badge active">Otključan</span>
                             <% } %>
                         </span>
                     </div>
+
                     <div class="info-item">
-                        <span class="info-label">Locked Until</span>
-                        <span class="info-value"><%= user.locked_until ? new Date(user.locked_until).toLocaleString() : 'N/A' %></span>
+                        <span class="info-label">Zaključan do</span>
+                        <span class="info-value">
+                            <%= user.locked_until ? new Date(user.locked_until).toLocaleString() : 'N/A' %>
+                        </span>
                     </div>
+
                     <div class="info-item">
-                        <span class="info-label">Failed Logins</span>
+                        <span class="info-label">Neuspješnih prijava</span>
                         <span class="info-value"><%= user.failed_login_attempts %></span>
                     </div>
+
                     <div class="info-item">
-                        <span class="info-label">Password Change</span>
-                        <span class="info-value"><%= user.must_change_password ? 'Required' : 'Not Required' %></span>
+                        <span class="info-label">Promjena lozinke</span>
+                        <span class="info-value">
+                            <%= user.must_change_password ? 'Obavezna pri sljedećoj prijavi' : 'Nije obavezna' %>
+                        </span>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -125,65 +165,76 @@
 
     <div class="details-card">
         <div class="card-header">
-            <h2>Manage User</h2>
+            <h2>Upravljanje korisnikom</h2>
         </div>
+
         <div class="card-body">
             <div class="actions-grid">
+
                 <form method="POST" action="/admin/lock/<%= user.id %>" class="action-form">
-                    <label for="lock-minutes">Lock Duration (minutes)</label>
-                    <div class="input-group">
-                        <input id="lock-minutes" name="minutes" type="number" placeholder="e.g., 60" required>
+                    <label for="lock-minutes">Trajanje zaključavanja (u minutama)</label>
+                        <input id="lock-minutes" name="minutes" type="number" placeholder="npr. 60" required>
                         <button type="submit" class="btn-action btn-warning">
-                            <i class="fas fa-lock"></i> Lock
+                            <i class="fas fa-lock"></i> Zaključaj
                         </button>
-                    </div>
+
                 </form>
 
                 <form method="POST" action="/admin/unlock/<%= user.id %>" class="action-form">
-                    <p>Remove temporary lock from the user's account.</p>
+                    <p>Ukloni privremeno zaključavanje korisničkog računa.</p>
                     <button type="submit" class="btn-action btn-success" <% if (!user.is_locked) { %> disabled <% } %>>
-                        <i class="fas fa-unlock"></i> Unlock
+                        <i class="fas fa-unlock"></i> Otključaj
                     </button>
                 </form>
 
                 <% if (user.banned) { %>
                     <form method="POST" action="/admin/unban/<%= user.id %>" class="action-form">
-                        <p>Reinstate a banned user's account access.</p>
+                        <p>Vrati pristup suspendovanom korisniku.</p>
                         <button type="submit" class="btn-action btn-success">
-                            <i class="fas fa-check-circle"></i> Unban
+                            <i class="fas fa-check-circle"></i> Aktiviraj korisnika
                         </button>
                     </form>
                 <% } else { %>
                     <form method="POST" action="/admin/ban/<%= user.id %>" class="action-form">
-                        <p>Permanently revoke access for this user.</p>
+                        <p>Trajno onemogući pristup korisniku.</p>
                         <button type="submit" class="btn-action btn-danger">
-                            <i class="fas fa-ban"></i> Ban User
+                            <i class="fas fa-ban"></i> Deaktiviraj korisnika
                         </button>
                     </form>
                 <% } %>
 
                 <form method="POST" action="/admin/reset-password/<%= user.id %>" class="action-form">
-                    <p>Force user to reset their password on next login.</p>
+                    <p>Nametni obaveznu promjenu lozinke pri sljedećoj prijavi.</p>
                     <button type="submit" class="btn-action btn-secondary">
-                        <i class="fas fa-key"></i> Reset Password
+                        <i class="fas fa-key"></i> Resetuj lozinku
                     </button>
                 </form>
 
-                <form method="POST" action="/admin/delete/<%= user.id %>" class="action-form" onsubmit="return confirm('Are you sure you want to permanently delete this user? This action cannot be undone.');">
-                    <p>Permanently delete this user and all their data.</p>
+                <form method="POST" action="/admin/delete/<%= user.id %>" class="action-form"
+                      onsubmit="return confirm('Jeste li sigurni da želite trajno obrisati ovog korisnika? Ova radnja je nepovratna.');">
+                    <p>Trajno obriši korisnika i sve povezane podatke.</p>
                     <button type="submit" class="btn-action btn-danger">
-                        <i class="fas fa-trash-alt"></i> Delete User
+                        <i class="fas fa-trash-alt"></i> Obriši korisnika
                     </button>
                 </form>
+
             </div>
         </div>
+
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     window.addEventListener('load', function() {
         document.getElementById('loading-overlay').classList.add('hidden');
     });
+
+    if (window.location.search.includes("success")) {
+        const cleanURL = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanURL);
+    }
 </script>
+
 </body>
 </html>
