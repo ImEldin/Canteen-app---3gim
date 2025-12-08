@@ -21,6 +21,26 @@ module.exports = {
                 if (!["first_break", "second_break"].includes(break_slot)) {
                     throw new Error("Izabrani odmor nije validan.");
                 }
+
+                const breakTimes = {
+                    first_break: { hour: 10, minute: 25 },   // prvi odmor
+                    second_break: { hour: 15, minute: 40 }   // drugi odmor
+                };
+
+                const now = new Date();
+                const currentHour = now.getHours();
+                if (currentHour < 9 || currentHour >= 15) {
+                    throw new Error("Narudžbe se mogu praviti samo između 09:00 i 15:00.");
+                }
+                const breakTime = breakTimes[break_slot];
+                const breakDate = new Date();
+                breakDate.setHours(breakTime.hour, breakTime.minute, 0, 0);
+
+                const thirtyMinBeforeBreak = new Date(breakDate.getTime() - 30 * 60 * 1000);
+
+                if (now > thirtyMinBeforeBreak) {
+                    throw new Error("Prekasno je za naručivanje za odabrani odmor. Narudžbe moraju biti napravljene najmanje 30 minuta prije početka odmora.");
+                }
             }
 
             if (pickup_time) {
@@ -30,6 +50,10 @@ module.exports = {
                 }
 
                 const now = new Date();
+                const currentHour = now.getHours();
+                if (currentHour < 9 || currentHour >= 15) {
+                    throw new Error("Narudžbe se mogu praviti samo između 09:00 i 15:00.");
+                }
                 const thirtyMinFromNow = new Date(now.getTime() + 30 * 60 * 1000);
 
                 const pickupDate = new Date();
