@@ -38,6 +38,12 @@
         <option value="price_asc" <%= filters.sort === "price_asc" ? "selected" : "" %>>Price ↑</option>
         <option value="price_desc" <%= filters.sort === "price_desc" ? "selected" : "" %>>Price ↓</option>
     </select>
+    <select name="pageSize">
+        <option value="10" <%= pageSize == 10 ? "selected" : "" %>>10</option>
+        <option value="20" <%= pageSize == 20 ? "selected" : "" %>>20</option>
+        <option value="50" <%= pageSize == 50 ? "selected" : "" %>>50</option>
+        <option value="100" <%= pageSize == 100 ? "selected" : "" %>>100</option>
+    </select>
     <button type="submit">Apply</button>
     <a href="/canteen/orders">
         <button type="button">Clear Filters</button>
@@ -80,5 +86,34 @@
 
     </div>
 <% }) %>
+
+<div style="display:flex; justify-content:center; gap:10px; margin-top:20px;">
+
+    <%
+    const queryString = Object.entries(filters)
+            .filter(([key, value]) => value && value !== "")
+            .map(([key, value]) => `${key}=${value}`)
+            .join("&");
+    %>
+
+    <!-- PREVIOUS PAGE -->
+    <% if (page > 1) { %>
+        <a href="/canteen/orders?<%= queryString %>&page=<%= page - 1 %>&pageSize=<%= pageSize %>">
+            <button>Previous</button>
+        </a>
+    <% } else { %>
+        <button disabled>Previous</button>
+    <% } %>
+
+    <!-- NEXT PAGE -->
+    <% if (hasMore) { %>
+        <a href="/canteen/orders?<%= queryString %>&page=<%= page + 1 %>&pageSize=<%= pageSize %>">
+            <button>Next</button>
+        </a>
+    <% } else { %>
+        <button disabled>Next</button>
+    <% } %>
+
+</div>
 
 <a href="/canteen">Back to Dashboard</a>

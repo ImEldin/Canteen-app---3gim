@@ -29,21 +29,24 @@ module.exports = {
                 must_change_password: result.user.must_change_password
             };
 
-            if (result.user.must_change_password) {
-                return res.redirect('/auth/change-password');
-            }
+            req.session.save(err => {
+                if (err) {
+                    console.error("Session save error:", err);
+                    return res.render('login', { error: "Došlo je do greške. Molimo pokušajte ponovo." });
+                }
 
-            switch (result.user.role) {
-                case 'admin':
-                    return res.redirect('/admin');
-                case 'ucenik':
-                case 'profesor':
-                    return res.redirect('/user');
-                case 'kantina':
-                    return res.redirect('/canteen');
-                default:
-                    return res.redirect('/');
-            }
+                if (result.user.must_change_password) {
+                    return res.redirect('/auth/change-password');
+                }
+
+                switch (result.user.role) {
+                    case 'admin':   return res.redirect('/admin');
+                    case 'ucenik':
+                    case 'profesor': return res.redirect('/user');
+                    case 'kantina':  return res.redirect('/canteen');
+                    default:         return res.redirect('/');
+                }
+            });
 
         } catch (err) {
             console.error(err);
@@ -94,20 +97,19 @@ module.exports = {
 
             const user = result.user;
 
-            req.session.user = {
-                id: user.id,
-                email: user.email,
-                username: user.username,
-                role: user.role,
-                must_change_password: user.must_change_password || false
-            };
+            req.session.save(err => {
+                if (err) {
+                    console.error("Session save error:", err);
+                    return res.render('login', { error: "Došlo je do greške. Molimo pokušajte ponovo." });
+                }
 
-            switch (user.role) {
-                case 'ucenik':
-                case 'profesor':  return res.redirect('/user');
-                case 'kantina':   return res.redirect('/canteen');
-                default:          return res.redirect('/');
-            }
+                switch (user.role) {
+                    case 'ucenik':
+                    case 'profesor': return res.redirect('/user');
+                    case 'kantina':  return res.redirect('/canteen');
+                    default:         return res.redirect('/');
+                }
+            });
 
         } catch (err) {
             console.error(err);

@@ -87,7 +87,7 @@ module.exports = {
         }
     },
 
-    async getAllOrders(where = {}, userWhere = {}, orderBy = null) {
+    async getAllOrders({where = {}, userWhere = {}, orderBy = null, offset = 0, limit = 20}) {
         try {
             const hasUserFilters =
                 Object.keys(userWhere).length > 0 ||
@@ -112,7 +112,9 @@ module.exports = {
                         ]
                     }
                 ],
-                ...(orderBy && { order: orderBy })
+                ...(orderBy && { order: orderBy }),
+                offset,
+                limit
             });
 
         } catch (err) {

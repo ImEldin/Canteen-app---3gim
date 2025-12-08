@@ -74,7 +74,7 @@ module.exports = {
         }
     },
 
-    async getAllOrders(filters = {}) {
+    async getAllOrders({ page = 1, pageSize = 20, filters = {} }) {
         try {
             const where = {};
             const userWhere = {};
@@ -85,10 +85,6 @@ module.exports = {
                     { email: { [Op.iLike]: `%${filters.user}%` } }
                 ];
             }
-
-            console.log(
-                util.inspect(userWhere, { showHidden: true, depth: null, colors: true })
-            );
 
             if (filters.break === "first_break") {
                 where.break_slot = "first_break";
@@ -109,7 +105,24 @@ module.exports = {
                 orderBy = [["total_amount", "DESC"]];
             }
 
-            return await orderRepository.getAllOrders(where, userWhere, orderBy);
+            const offset = (page - 1) * pageSize;
+
+            const result = await orderRepository.getAllOrders({
+                where,
+                userWhere,
+                orderBy,
+                offset,
+                limit: pageSize + 1
+            });
+
+            const hasMore = result.length > pageSize;
+
+            return {
+                orders: result.slice(0, pageSize),
+                hasMore
+            };
+
+
         } catch (err) {
             console.error("Error fetching all orders:", err);
             throw new Error("Nije moguće dohvatiti narudžbe.");

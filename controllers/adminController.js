@@ -6,7 +6,6 @@ module.exports = {
     showDashboard(req, res) {
         try {
             const user = req.session.user;
-            console.log(user);
             res.render('admin/dashboard', { user });
         } catch (err) {
             console.error(err);

@@ -63,7 +63,9 @@ module.exports = {
             if (existing) existing.quantity += 1;
             else req.session.cart.push({ id: item.id, name: item.name, price: item.price, quantity: 1 });
 
-            res.redirect("/user/menu");
+            req.session.save(() => {
+                res.redirect("/user/menu");
+            });
 
         } catch (err) {
             console.error(err);
@@ -83,7 +85,9 @@ module.exports = {
                 req.session.cart = req.session.cart.filter(i => i.id !== itemId);
             }
 
-            res.redirect('/user/menu');
+            req.session.save(() => {
+                res.redirect("/user/menu");
+            });
 
         } catch (err) {
             console.error(err);

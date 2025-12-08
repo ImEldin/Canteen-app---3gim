@@ -18,6 +18,9 @@ module.exports = {
 
     async showOrders(req, res) {
         try {
+            const page = parseInt(req.query.page) || 1;
+            const pageSize = parseInt(req.query.pageSize) || 20;
+
             const filters = {
                 user: req.query.user || "",
                 role: req.query.role || "",
@@ -25,13 +28,23 @@ module.exports = {
                 sort: req.query.sort || "newest"
             };
 
-            const orders = await orderService.getAllOrders(filters);
+            const  { orders, hasMore }  = await orderService.getAllOrders({
+                page,
+                pageSize,
+                filters
+            });
 
-            res.render('canteen/orders', { orders, filters });
+            res.render('canteen/orders', {
+                orders,
+                filters,
+                page,
+                pageSize,
+                hasMore
+            });
 
         } catch (err) {
             console.error(err);
-            res.status(500).render('error', { message: 'Neuspješno učitavanje narudžbi.' });
+            res.status(500).render('error', { message: 'Neuspješno učitavanje narudžbi.'});
         }
     },
 

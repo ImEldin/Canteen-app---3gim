@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" href="/images/TGS-logo.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greška - Kantina</title>
+    <title>Greška</title>
     <link rel="stylesheet" href="/stylesheets/user/userBody.css">
     <link rel="stylesheet" href="/stylesheets/error.css">
 </head>
@@ -13,19 +13,21 @@
 
 <div class="error-container">
     <div class="error-card">
-        <% if (error && error.status) { %>
-            <h1 class="error-status"><%= error.status %></h1>
-        <% } %>
         <h2 class="error-message"><%= message %></h2>
         <p class="error-description">Došlo je do neočekivane greške. Molimo pokušajte ponovo kasnije ili se vratite na početnu stranicu.</p>
-
-        <% if (process.env.NODE_ENV === 'development' && error && error.stack) { %>
-            <div class="error-stack-container">
-                <pre class="error-stack"><%= error.stack %></pre>
-            </div>
+        <% if (currentUser && currentUser.role) { %>
+            <% if (currentUser.role === 'admin') { %>
+                <a href="/admin" class="btn-home">Vrati se na početnu</a>
+            <% } else if (currentUser.role === 'ucenik' || currentUser.role === 'profesor' ) { %>
+                <a href="/user" class="btn-home">Vrati se na početnu</a>
+            <% } else if (currentUser.role === 'kantina') { %>
+                <a href="/canteen" class="btn-home">Vrati se na početnu</a>
+            <% } else { %>
+                <a href="/auth/logout" class="btn-home">Vrati se na login</a>
+            <% } %>
+        <% } else { %>
+            <a href="/auth/logout" class="btn-home">Vrati se na login</a>
         <% } %>
-
-        <a href="/" class="btn-home">Vrati se na početnu</a>
     </div>
 </div>
 
