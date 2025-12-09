@@ -1,53 +1,55 @@
 <h1>Canteen Menu</h1>
 
-<% if (menu && menu.length > 0) { %>
-    <div style="padding:15px;border:2px solid #4e796b;margin-bottom:25px;border-radius:8px;">
-        <h2>Existing Menu</h2>
+<div id="menuDisplayContainer">
+    <% if (menu && menu.length > 0) { %>
+        <div style="padding:15px;border:2px solid #4e796b;margin-bottom:25px;border-radius:8px;">
+            <h2>Existing Menu</h2>
 
-        <% menu.forEach(item => { %>
-            <div style="border-bottom:1px solid #ccc;margin-bottom:12px;padding-bottom:10px;">
-                <% if (item.image_url) { %>
-                    <img
-                            src="<%= item.image_url %>"
-                            style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-bottom: 6px;"
-                    >
-                <% } %><br>
+            <% menu.forEach(item => { %>
+                <div style="border-bottom:1px solid #ccc;margin-bottom:12px;padding-bottom:10px;">
+                    <% if (item.image_url) { %>
+                        <img src="<%= item.image_url %>" style="width:40px;height:40px;object-fit:cover;border-radius:6px;margin-bottom:6px;">
+                    <% } %><br>
 
-                <strong><%= item.name %></strong> - $<%= item.price %><br>
-                <small><%= item.description %></small><br>
+                    <strong><%= item.name %></strong> - $<%= item.price %><br>
+                    <small><%= item.description %></small><br>
 
-                <div style="margin-top:6px;">
-                    <% if (item.Tags && item.Tags.length > 0) { %>
-                        <% item.Tags.forEach(t => { %>
-                            <span style="background:#ddd;padding:3px 6px;border-radius:4px;margin-right:6px;">
-                                <%= t.name %>
-                            </span>
-                        <% }) %>
-                    <% } %>
+                    <div style="margin-top:6px;">
+                        <% if (item.Tags && item.Tags.length > 0) { %>
+                            <% item.Tags.forEach(t => { %>
+                                <span style="background:#ddd;padding:3px 6px;border-radius:4px;margin-right:6px;">
+                                    <%= t.name %>
+                                </span>
+                            <% }) %>
+                        <% } %>
+                    </div>
                 </div>
+            <% }) %>
+
+            <div style="margin-top:10px;">
+                <button id="editMenuBtn" style="padding:8px 14px;">Edit Menu</button>
+
+                <form action="/canteen/menu/delete" method="POST" style="display:inline;">
+                    <button type="submit" style="padding:8px 14px;background:red;color:white;border:none;border-radius:6px;cursor:pointer;">
+                        Delete Menu
+                    </button>
+                </form>
             </div>
-        <% }) %>
+        </div>
+    <% } else { %>
+        <button id="createMenuBtn" style="padding:8px 14px;">Create New Menu</button>
+    <% } %>
+</div>
 
-        <form method="POST" action="/canteen/menu/delete">
-            <button type="submit" style="background:red;color:white;padding:8px 14px;border:none;border-radius:6px; cursor:pointer;">
-                Delete Existing Menu
-            </button>
-        </form>
-    </div>
-<% } else { %>
-    <p style="color:#888;">No current menu.</p>
-<% } %>
-
-<h1><%= menu && menu.length > 0 ? "Edit Menu" : "Create New Menu" %></h1>
-
-<form id="menuForm" action="/canteen/menu" method="POST" enctype="multipart/form-data">
-    <div id="menuItemsContainer"></div>
-
-    <button type="button" id="addMenuItemBtn">+ Add Menu Item</button>
-
-    <br><br>
-    <button type="submit" style="padding:10px 20px;">Save Menu</button>
-</form>
+<!-- Hidden menu form -->
+<div id="menuFormContainer" style="display:none;">
+    <form id="menuForm" action="/canteen/menu" method="POST" enctype="multipart/form-data">
+        <div id="menuItemsContainer"></div>
+        <button type="button" id="addMenuItemBtn">+ Add Menu Item</button>
+        <br><br>
+        <button type="submit" style="padding:10px 20px;">Save Menu</button>
+    </form>
+</div>
 
 <a href="/canteen">
     <button type="button">Back</button>
@@ -57,64 +59,86 @@
     const tags = <%- JSON.stringify(tags) %>;
     let itemIndex = 0;
 
-    <% if (menu && menu.length > 0) { %>
-    <% menu.forEach((item) => { %>
-    addMenuItem(
-        `<%= item.name %>`,
-        `<%= item.description %>`,
-        `<%= item.price %>`,
-        `<%= item.image_url %>`,
-            <%- JSON.stringify(item.Tags.map(t => t.id)) %>
-    );
-    <% }) %>
-    <% } %>
+    // Show form when clicking Edit or Create
+    const editBtn = document.getElementById("editMenuBtn");
+    const createBtn = document.getElementById("createMenuBtn");
+    const formContainer = document.getElementById("menuFormContainer");
+    const menuDisplayContainer = document.getElementById("menuDisplayContainer");
+
+    if (editBtn) {
+        editBtn.addEventListener("click", () => {
+            menuDisplayContainer.style.display = "none";
+            formContainer.style.display = "block";
+            prefillForm();
+        });
+    }
+
+    if (createBtn) {
+        createBtn.addEventListener("click", () => {
+            menuDisplayContainer.style.display = "none";
+            formContainer.style.display = "block";
+        });
+    }
 
     document.getElementById("addMenuItemBtn").addEventListener("click", () => {
         addMenuItem("", "", "", "", []);
     });
 
+    function prefillForm() {
+        <% if (menu && menu.length > 0) { %>
+        <% menu.forEach((item) => { %>
+        addMenuItem(
+            `<%= item.name %>`,
+            `<%= item.description %>`,
+            `<%= item.price %>`,
+            `<%= item.image_url %>`,
+                <%- JSON.stringify(item.Tags.map(t => t.id)) %>
+        );
+        <% }) %>
+        <% } %>
+    }
+
     function addMenuItem(name, description, price, imageUrl, existingTags) {
         const container = document.getElementById("menuItemsContainer");
 
         const html = `
-        <div class="menu-item" data-index="${itemIndex}" style="border:1px solid #aaa;padding:10px;margin-bottom:10px;">
-            <h3>Menu Item #${itemIndex + 1}</h3>
+            <div class="menu-item" data-index="${itemIndex}" style="border:1px solid #aaa;padding:10px;margin-bottom:10px;">
+                <h3>Menu Item #${itemIndex + 1}</h3>
 
-            <label>Name:</label>
-            <input name="items[${itemIndex}][name]" value="${name}" required>
+                <label>Name:</label>
+                <input name="items[${itemIndex}][name]" value="${name}" required>
 
-            <label>Description:</label>
-            <input name="items[${itemIndex}][description]" value="${description}" required>
+                <label>Description:</label>
+                <input name="items[${itemIndex}][description]" value="${description}" required>
 
-            <label>Price:</label>
-            <input name="items[${itemIndex}][price]" type="number" step="0.01" value="${price}" required>
+                <label>Price:</label>
+                <input name="items[${itemIndex}][price]" type="number" step="0.01" value="${price}" required>
 
-            <input type="hidden" name="items[${itemIndex}][image]" value="${imageUrl || ""}">
+                <input type="hidden" name="items[${itemIndex}][image]" value="${imageUrl || ""}">
 
-            <label>Image:</label>
-            <input type="file" name="images[${itemIndex}]" accept="image/*">
+                <label>Image:</label>
+                <input type="file" name="images[${itemIndex}]" accept="image/*">
 
-            ${imageUrl ? `<img src="${imageUrl}" width="50" style="display:block;margin:8px 0;">` : ""}
+                ${imageUrl ? `<img src="${imageUrl}" width="50" style="display:block;margin:8px 0;">` : ""}
 
-            <div class="tags">
-                <label>Tags:</label>
-                <select id="tag-select-${itemIndex}">
-                    ${tags.map(t => `<option value="${t.id}">${t.name}</option>`).join("")}
-                </select>
-                <button type="button" onclick="addTag(${itemIndex})">Add Tag</button>
-                <div id="tag-list-${itemIndex}" style="margin-top:5px;"></div>
+                <div class="tags">
+                    <label>Tags:</label>
+                    <select id="tag-select-${itemIndex}">
+                        ${tags.map(t => `<option value="${t.id}">${t.name}</option>`).join("")}
+                    </select>
+                    <button type="button" onclick="addTag(${itemIndex})">Add Tag</button>
+                    <div id="tag-list-${itemIndex}" style="margin-top:5px;"></div>
+                </div>
+
+                <button type="button" onclick="removeMenuItem(${itemIndex})" style="margin-top:10px;color:red;">
+                    Remove Menu Item
+                </button>
             </div>
-
-            <button type="button" onclick="removeMenuItem(${itemIndex})" style="margin-top:10px;color:red;">
-                Remove Menu Item
-            </button>
-        </div>
-    `;
+        `;
 
         container.insertAdjacentHTML("beforeend", html);
 
         const list = document.getElementById(`tag-list-${itemIndex}`);
-
         existingTags.forEach(tid => {
             const tagObj = tags.find(t => t.id === tid);
             if (!tagObj) return;
@@ -135,11 +159,9 @@
         const select = document.getElementById(`tag-select-${i}`);
         const list = document.getElementById(`tag-list-${i}`);
         const selectedOption = select.options[select.selectedIndex];
-
         if (!selectedOption) return;
 
-        if ([...list.querySelectorAll("input")].some(input => input.value == selectedOption.value))
-            return;
+        if ([...list.querySelectorAll("input")].some(input => input.value == selectedOption.value)) return;
 
         list.insertAdjacentHTML("beforeend", `
             <span style="padding:4px;background:#ddd;margin-right:6px;border-radius:4px;">
