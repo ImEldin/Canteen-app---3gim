@@ -187,7 +187,7 @@
     padding: 40px;
     color: var(--text-gray);
     font-size: 1.1rem;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255);
     border-radius: 16px;
 }
 
