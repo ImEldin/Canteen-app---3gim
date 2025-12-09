@@ -97,6 +97,14 @@ module.exports = {
 
             const user = result.user;
 
+            req.session.user = {
+                id: user.id,
+                email: user.email,
+                username: user.username,
+                role: user.role,
+                must_change_password: user.must_change_password || false
+            };
+
             req.session.save(err => {
                 if (err) {
                     console.error("Session save error:", err);

@@ -68,7 +68,7 @@
 
             <% if (order.break_slot) { %>
                 <strong>Break:</strong>
-                <%= order.break_slot === "first_break" ? "First Break" : "Second Break" %><br>
+                <%= order.break_slot === "first_break" ? "First Break (10:25 - 10:45)" : "Second Break (15:40 - 16:00)" %><br>
             <% } %>
 
             <strong>Total:</strong> <%= order.total_amount %> KM
@@ -96,7 +96,6 @@
             .join("&");
     %>
 
-    <!-- PREVIOUS PAGE -->
     <% if (page > 1) { %>
         <a href="/canteen/orders?<%= queryString %>&page=<%= page - 1 %>&pageSize=<%= pageSize %>">
             <button>Previous</button>
@@ -105,7 +104,6 @@
         <button disabled>Previous</button>
     <% } %>
 
-    <!-- NEXT PAGE -->
     <% if (hasMore) { %>
         <a href="/canteen/orders?<%= queryString %>&page=<%= page + 1 %>&pageSize=<%= pageSize %>">
             <button>Next</button>

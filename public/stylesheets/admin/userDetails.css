@@ -286,7 +286,6 @@
     color: #065f46;
 }
 
-/* Custom Modal Styles */
 .modal-backdrop.show {
     backdrop-filter: blur(3px);
     background-color: rgba(28, 25, 23, 0.3);
