@@ -91,10 +91,48 @@ module.exports = {
 
     async deleteOrder(orderId) {
         try {
+            const order = await orderRepository.getOrderById(orderId);
+            if (!order) throw new Error("Narudžba ne postoji.");
+
+            const now = new Date();
+
+            if (order.pickup_time) {
+                const [hour, minute] = order.pickup_time.split(":").map(Number);
+
+                const pickupDate = new Date();
+                pickupDate.setHours(hour, minute, 0, 0);
+
+                const thirtyMinBeforePickup = new Date(pickupDate.getTime() - 30 * 60 * 1000);
+
+                if (now >= thirtyMinBeforePickup) {
+                    throw new Error("Narudžbu nije moguće obrisati manje od 30 minuta prije preuzimanja.");
+                }
+            }
+
+            if (order.break_slot) {
+                const breakTimes = {
+                    first_break:  { hour: 10, minute: 25 },
+                    second_break: { hour: 15, minute: 40 }
+                };
+
+                const bt = breakTimes[order.break_slot];
+                if (bt) {
+                    const breakDate = new Date();
+                    breakDate.setHours(bt.hour, bt.minute, 0, 0);
+
+                    const thirtyMinBeforeBreak = new Date(breakDate.getTime() - 30 * 60 * 1000);
+
+                    if (now >= thirtyMinBeforeBreak) {
+                        throw new Error("Narudžbu nije moguće obrisati manje od 30 minuta prije odmora.");
+                    }
+                }
+            }
+
             return await orderRepository.deleteOrder(orderId);
+
         } catch (err) {
             console.error(`Error deleting order ${orderId}:`, err);
-            throw new Error("Nije moguće obrisati narudžbu.");
+            throw new Error(err.message || "Nije moguće obrisati narudžbu.");
         }
     },
 

@@ -84,7 +84,7 @@
     <% if (typeof error !== "undefined" && error) { %>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <%= error %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zatvori"></button>
+            <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
         </div>
     <% } %>
 

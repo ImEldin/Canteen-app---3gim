@@ -1,3 +1,8 @@
+:root {
+    --danger-light: #fee2e2;
+    --danger-red: #991b1b;
+}
+
 .orders-container {
     max-width: 900px;
     margin: 0 auto;
@@ -266,6 +271,19 @@
     transition: opacity 0.3s ease;
 }
 
+.orders-container .close-btn-success {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #065f46;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
 .orders-container .close-btn:hover {
     opacity: 1;
 }
@@ -277,7 +295,7 @@
 }
 
 .order-footer form {
-    margin-right: -5px; /* Added to shift button slightly right */
+    margin-right: -5px;
 }
 
 

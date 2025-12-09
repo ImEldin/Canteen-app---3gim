@@ -168,21 +168,27 @@ module.exports = {
             const userId = req.session.user.id;
 
             const order = await orderService.getOrderById(orderId);
+
             if (!order || order.user_id !== userId) {
-                return res.status(403).render('error', { message: 'Nemate ovlasti za brisanje ove narudžbe.' });
+                return res.status(403).render('error', {
+                    message: 'Nemate ovlasti za brisanje ove narudžbe.'
+                });
             }
 
-            const deleted = await orderService.deleteOrder(orderId);
-            if (!deleted) {
-                return res.redirect('/user/orders?error=Greška pri brisanju narudžbe.');
-            }
+            await orderService.deleteOrder(orderId);
 
             return res.redirect('/user/orders?success=Narudžba je uspješno obrisana.');
 
-
         } catch (err) {
-            console.error(err);
-            res.status(500).render('error', { message: 'Neuspjelo brisanje narudžbe.' });
+            console.error("Delete error:", err);
+
+            if (err.message) {
+                return res.redirect(`/user/orders?error=${encodeURIComponent(err.message)}`);
+            }
+
+            return res.status(500).render('error', {
+                message: 'Neuspjelo brisanje narudžbe.'
+            });
         }
     }
 };
