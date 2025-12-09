@@ -4,7 +4,7 @@ const upload = require('../utils/uploads');
 
 module.exports = {
 
-    uploadMiddleware: upload.array("images"),
+    uploadMiddleware: upload.any(),
 
     showDashboard(req, res) {
         try {
@@ -51,15 +51,19 @@ module.exports = {
     async createMenu(req, res) {
         try {
             if (!req.body.items || !Array.isArray(req.body.items) || req.body.items.length === 0) {
-                return res.render('canteen/menu', { error: 'Meni mora sadržavati barem jednu stavku.', items: [] });
+                const [menu, tags] = await menuService.getMenuItems({});
+                return res.render('canteen/menu', { error: 'Meni mora sadržavati barem jednu stavku.', menu, tags, items: [] });
             }
 
             const items = req.body.items;
 
             if (req.files && req.files.length > 0) {
-                items.forEach((item, idx) => {
-                    if (req.files[idx]) {
-                        item.image = `/uploads/${req.files[idx].filename}`;
+                req.files.forEach(file => {
+                    const match = file.fieldname.match(/images\[(\d+)\]/);
+
+                    if (match) {
+                        const index = Number(match[1]);
+                        items[index].image = `/uploads/${file.filename}`;
                     }
                 });
             }

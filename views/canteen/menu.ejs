@@ -9,10 +9,10 @@
                 <% if (item.image_url) { %>
                     <img
                             src="<%= item.image_url %>"
-                            alt="<%= item.name %>"
                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-bottom: 6px;"
                     >
                 <% } %><br>
+
                 <strong><%= item.name %></strong> - $<%= item.price %><br>
                 <small><%= item.description %></small><br>
 
@@ -26,7 +26,7 @@
                     <% } %>
                 </div>
             </div>
-        <% }); %>
+        <% }) %>
 
         <form method="POST" action="/canteen/menu/delete">
             <button type="submit" style="background:red;color:white;padding:8px 14px;border:none;border-radius:6px; cursor:pointer;">
@@ -38,9 +38,8 @@
     <p style="color:#888;">No current menu.</p>
 <% } %>
 
-<h1>Create New Menu</h1>
+<h1><%= menu && menu.length > 0 ? "Edit Menu" : "Create New Menu" %></h1>
 
-<!-- Add enctype="multipart/form-data" for file uploads -->
 <form id="menuForm" action="/canteen/menu" method="POST" enctype="multipart/form-data">
     <div id="menuItemsContainer"></div>
 
@@ -58,9 +57,23 @@
     const tags = <%- JSON.stringify(tags) %>;
     let itemIndex = 0;
 
-    document.getElementById("addMenuItemBtn").addEventListener("click", addMenuItem);
+    <% if (menu && menu.length > 0) { %>
+    <% menu.forEach((item) => { %>
+    addMenuItem(
+        `<%= item.name %>`,
+        `<%= item.description %>`,
+        `<%= item.price %>`,
+        `<%= item.image_url %>`,
+            <%- JSON.stringify(item.Tags.map(t => t.id)) %>
+    );
+    <% }) %>
+    <% } %>
 
-    function addMenuItem() {
+    document.getElementById("addMenuItemBtn").addEventListener("click", () => {
+        addMenuItem("", "", "", "", []);
+    });
+
+    function addMenuItem(name, description, price, imageUrl, existingTags) {
         const container = document.getElementById("menuItemsContainer");
 
         const html = `
@@ -68,21 +81,25 @@
             <h3>Menu Item #${itemIndex + 1}</h3>
 
             <label>Name:</label>
-            <input name="items[${itemIndex}][name]" required>
+            <input name="items[${itemIndex}][name]" value="${name}" required>
 
             <label>Description:</label>
-            <input name="items[${itemIndex}][description]" required>
+            <input name="items[${itemIndex}][description]" value="${description}" required>
 
             <label>Price:</label>
-            <input name="items[${itemIndex}][price]" type="number" step="0.01" required>
+            <input name="items[${itemIndex}][price]" type="number" step="0.01" value="${price}" required>
+
+            <input type="hidden" name="items[${itemIndex}][image]" value="${imageUrl || ""}">
 
             <label>Image:</label>
-            <input type="file" name="images" accept="image/*">
+            <input type="file" name="images[${itemIndex}]" accept="image/*">
+
+            ${imageUrl ? `<img src="${imageUrl}" width="50" style="display:block;margin:8px 0;">` : ""}
 
             <div class="tags">
                 <label>Tags:</label>
                 <select id="tag-select-${itemIndex}">
-                    ${tags.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                    ${tags.map(t => `<option value="${t.id}">${t.name}</option>`).join("")}
                 </select>
                 <button type="button" onclick="addTag(${itemIndex})">Add Tag</button>
                 <div id="tag-list-${itemIndex}" style="margin-top:5px;"></div>
@@ -92,9 +109,25 @@
                 Remove Menu Item
             </button>
         </div>
-        `;
+    `;
 
         container.insertAdjacentHTML("beforeend", html);
+
+        const list = document.getElementById(`tag-list-${itemIndex}`);
+
+        existingTags.forEach(tid => {
+            const tagObj = tags.find(t => t.id === tid);
+            if (!tagObj) return;
+
+            list.insertAdjacentHTML("beforeend", `
+                <span style="padding:4px;background:#ddd;margin-right:6px;border-radius:4px;">
+                    ${tagObj.name}
+                    <button type="button" onclick="this.parentElement.remove()">x</button>
+                    <input type="hidden" name="items[${itemIndex}][tags][]" value="${tagObj.id}">
+                </span>
+            `);
+        });
+
         itemIndex++;
     }
 
@@ -102,18 +135,19 @@
         const select = document.getElementById(`tag-select-${i}`);
         const list = document.getElementById(`tag-list-${i}`);
         const selectedOption = select.options[select.selectedIndex];
+
         if (!selectedOption) return;
 
-        if ([...list.querySelectorAll('input')].some(input => input.value == selectedOption.value)) return;
+        if ([...list.querySelectorAll("input")].some(input => input.value == selectedOption.value))
+            return;
 
-        const tagHtml = `
+        list.insertAdjacentHTML("beforeend", `
             <span style="padding:4px;background:#ddd;margin-right:6px;border-radius:4px;">
                 ${selectedOption.text}
                 <button type="button" onclick="this.parentElement.remove()">x</button>
                 <input type="hidden" name="items[${i}][tags][]" value="${selectedOption.value}">
             </span>
-        `;
-        list.insertAdjacentHTML("beforeend", tagHtml);
+        `);
     }
 
     function removeMenuItem(i) {
