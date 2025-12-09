@@ -29,8 +29,8 @@ module.exports = {
 
                 const now = new Date();
                 const currentHour = now.getHours();
-                if (currentHour < 9 || currentHour >= 15) {
-                    throw new Error("Narudžbe se mogu praviti samo između 09:00 i 15:00.");
+                if (currentHour < 8 || currentHour >= 16) {
+                    throw new Error("Narudžbe se mogu praviti samo između 08:00 i 16:00.");
                 }
                 const breakTime = breakTimes[break_slot];
                 const breakDate = new Date();
@@ -45,14 +45,30 @@ module.exports = {
 
             if (pickup_time) {
                 const [hour, minute] = pickup_time.split(":").map(Number);
-                if (hour < 9 || hour > 15 || (hour === 15 && minute > 0)) {
-                    throw new Error("Vrijeme preuzimanja mora biti između 09:00 i 15:00.");
+
+                const pickupMinutes = hour * 60 + minute;
+
+                const firstBreakStart = 10 * 60 + 25;
+                const firstBreakEnd   = 10 * 60 + 45;
+
+                const secondBreakStart = 15 * 60 + 40;
+                const secondBreakEnd   = 16 * 60;
+
+                const inFirstBreak  = pickupMinutes >= firstBreakStart && pickupMinutes < firstBreakEnd;
+                const inSecondBreak = pickupMinutes >= secondBreakStart && pickupMinutes < secondBreakEnd;
+
+                if (inFirstBreak || inSecondBreak) {
+                    throw new Error("Vrijeme preuzimanja ne može biti u periodu velikog odmora.");
+                }
+
+                if (hour < 8 || hour > 16 || (hour === 16 && minute > 0)) {
+                    throw new Error("Vrijeme preuzimanja mora biti između 08:00 i 16:00.");
                 }
 
                 const now = new Date();
                 const currentHour = now.getHours();
-                if (currentHour < 9 || currentHour >= 15) {
-                    throw new Error("Narudžbe se mogu praviti samo između 09:00 i 15:00.");
+                if (currentHour < 8 || currentHour >= 16) {
+                    throw new Error("Narudžbe se mogu praviti samo između 08:00 i 16:00.");
                 }
                 const thirtyMinFromNow = new Date(now.getTime() + 30 * 60 * 1000);
 
