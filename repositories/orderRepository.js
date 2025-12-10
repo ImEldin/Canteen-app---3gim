@@ -1,4 +1,4 @@
-const { Order, OrderItem, MenuItem, User } = require("../models");
+const { Order, OrderItem, MenuItem, User, sequelize } = require("../models");
 
 module.exports = {
     async createOrder(userId, items, pickup) {
@@ -139,6 +139,70 @@ module.exports = {
         } catch (err) {
             console.error(`Error updating status for order ${id}:`, err);
             throw new Error("Nije moguće ažurirati status narudžbe.");
+        }
+    },
+
+    async getBreakSummary(slot) {
+        try {
+            const query = `
+            SELECT 
+                mi.id AS item_id,
+                mi.name AS item_name,
+                SUM(oi.quantity) AS total_quantity,
+                SUM(oi.total_price) AS total_revenue
+            FROM order_items oi
+            JOIN orders o ON oi.order_id = o.id
+            JOIN menu_items mi ON oi.menu_item_id = mi.id
+            WHERE o.break_slot = :slot AND o.completed = false
+            GROUP BY mi.id, mi.name
+            ORDER BY total_quantity DESC;
+        `;
+
+            const [results] = await sequelize.query(query, {
+                replacements: { slot }
+            });
+
+            return results;
+
+        } catch (err) {
+            console.error(`Error fetching break summary for slot ${slot}:`, err);
+            throw new Error("Nije moguće dohvatiti sažetak za ovaj odmor.");
+        }
+    },
+
+    async getBreakTotal(breakName) {
+        try {
+            const [rows] = await sequelize.query(
+                `SELECT COALESCE(SUM(oi.total_price), 0) AS total_sum
+             FROM order_items oi
+             JOIN orders o ON oi.order_id = o.id
+             WHERE o.break_slot = :breakName
+               AND o.completed = FALSE`,
+                { replacements: { breakName } }
+            );
+
+            return rows[0].total_sum;
+
+        } catch (err) {
+            console.error(`Error fetching total for break ${breakName}:`, err);
+            throw new Error("Nije moguće izračunati ukupni iznos za ovaj odmor.");
+        }
+    },
+
+    async completeBreak(slot) {
+        try {
+            return await Order.update(
+                { completed: true },
+                {
+                    where: {
+                        break_slot: slot,
+                        completed: false
+                    }
+                }
+            );
+        } catch (err) {
+            console.error(`Error completing break ${slot}:`, err);
+            throw new Error("Nije moguće označiti odmor kao završen.");
         }
     }
 };

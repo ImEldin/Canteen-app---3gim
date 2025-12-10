@@ -20,6 +20,10 @@ module.exports = {
         try {
             const page = parseInt(req.query.page) || 1;
             const pageSize = parseInt(req.query.pageSize) || 20;
+            const user = req.session.user;
+
+            const firstBreakReport = await orderService.getBreakReport("first_break");
+            const secondBreakReport = await orderService.getBreakReport("second_break");
 
             const { error, success } = req.query;
 
@@ -44,7 +48,12 @@ module.exports = {
                 pageSize,
                 hasMore,
                 error,
-                success
+                success,
+                user,
+                breakReports: {
+                    first_break: firstBreakReport,
+                    second_break: secondBreakReport
+                }
             });
 
         } catch (err) {
@@ -107,6 +116,20 @@ module.exports = {
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Neuspješno deaktiviranje menija.' });
+        }
+    },
+
+    async completeBreak(req, res) {
+        try {
+            const slot = req.params.slot;
+
+            const result = await orderService.completeBreak(slot);
+
+            return res.redirect(`/canteen/orders?success=${encodeURIComponent(result.message)}`);
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).render("error", { message: "Neuspješno kompletiranje odmora." });
         }
     }
 };

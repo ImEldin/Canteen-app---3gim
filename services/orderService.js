@@ -235,5 +235,44 @@ module.exports = {
             console.error(err);
             return { error: "Greška pri ažuriranju statusa." };
         }
+    },
+
+    async getBreakReport(slot) {
+        try {
+            if (!slot) throw new Error("Nije odabran validan odmor.");
+
+            const items = await orderRepository.getBreakSummary(slot);
+            const total = await orderRepository.getBreakTotal(slot);
+
+            return {
+                slot,
+                items,
+                total: total || 0
+            };
+
+        } catch (err) {
+            console.error(`Error fetching break report for slot "${slot}":`, err);
+            throw new Error("Nije moguće učitati izvještaj za odmor.");
+        }
+    },
+
+
+    async completeBreak(slot) {
+        try {
+            if (!slot) throw new Error("Nije odabran odmor za kompletiranje.");
+
+            const valid = ["first_break", "second_break"];
+            if (!valid.includes(slot)) {
+                throw new Error("Nepoznat odmor.");
+            }
+
+            await orderRepository.completeBreak(slot);
+
+            return { message: `Odmor je uspješno kompletiran.` };
+
+        } catch (err) {
+            console.error(`Error completing break "${slot}":`, err);
+            throw new Error("Nije moguće kompletirati odmor.");
+        }
     }
 };

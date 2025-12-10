@@ -13,5 +13,6 @@ router.post("/orders/toggle-status/:id", canteenController.toggleOrderStatus);
 router.get("/menu", menuController.getMenu);
 router.post("/menu", canteenController.uploadMiddleware, canteenController.createMenu);
 router.post("/menu/delete", canteenController.deactivateMenu);
+router.post('/orders/complete/:slot', canteenController.completeBreak);
 
 module.exports = router;
