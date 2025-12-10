@@ -135,7 +135,7 @@
                                     <div class="break-summary-footer">
                                         <strong>Ukupno: <%= Number(breakReports.first_break.total).toFixed(2) %> KM</strong>
                                         <form action="/canteen/orders/complete/first_break" method="POST">
-                                            <button class="btn btn-success btn-sm">Kompletiraj odmor</button>
+                                            <button type="button" class="btn btn-success btn-sm btn-complete-break">Kompletiraj odmor</button>
                                         </form>
                                     </div>
                                 <% } %>
@@ -275,5 +275,45 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/javascripts/canteen/orders.js"></script>
+<div class="modal fade" id="completeBreakModal" tabindex="-1" aria-labelledby="completeBreakModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="completeBreakModalLabel">Potvrda kompletiranja</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Jeste li sigurni da želite kompletirati ovaj odmor? Sve aktivne narudžbe za ovaj odmor bit će označene kao završene.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Odustani</button>
+                <button type="button" class="btn btn-success" id="confirmCompleteBreakBtn">Kompletiraj</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const completeBreakModal = new bootstrap.Modal(document.getElementById('completeBreakModal'));
+        const confirmCompleteBreakBtn = document.getElementById('confirmCompleteBreakBtn');
+        let formToSubmit;
+
+        document.querySelectorAll('.btn-complete-break').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                formToSubmit = this.closest('form');
+                completeBreakModal.show();
+            });
+        });
+
+        confirmCompleteBreakBtn.addEventListener('click', function() {
+            if (formToSubmit) {
+                formToSubmit.submit();
+            }
+        });
+    });
+</script>
+
 </body>
 </html>
