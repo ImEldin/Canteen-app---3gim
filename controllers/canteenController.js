@@ -32,7 +32,7 @@ module.exports = {
                 role: req.query.role || "",
                 break: req.query.break || "",
                 sort: req.query.sort || "newest",
-                completed: req.query.completed === "true" ? "true" : "false"
+                completed: req.query.showCompleted === "true" ? "true" : "false"
             };
 
             const  { orders, hasMore }  = await orderService.getAllOrders({

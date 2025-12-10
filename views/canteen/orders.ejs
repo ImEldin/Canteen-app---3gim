@@ -1,237 +1,279 @@
-<h1>All Orders</h1>
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/images/TGS-logo.png" type="image/png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sve narudžbe</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/stylesheets/shared/loadingSpinner.css">
+    <link rel="stylesheet" href="/stylesheets/shared/topBar.css">
+    <link rel="stylesheet" href="/stylesheets/shared/body.css">
+    <link rel="stylesheet" href="/stylesheets/canteen/orders.css">
+</head>
+<body>
+<div class="loading-overlay" id="loading-overlay"><div class="spinner"></div></div>
+<div id="bg-fixed"></div>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-    .alert {
-        padding: 10px;
-        border-radius: 6px;
-        margin-bottom: 10px;
-    }
-    .alert-success {
-        background: #d4edda;
-        color: #155724;
-    }
-    .alert-danger {
-        background: #f8d7da;
-        color: #721c24;
-    }
-</style>
+<div class="top-bar">
+    <div class="admin-info">
+        <div class="admin-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
+        <span class="admin-name"><%= user.username %></span>
+    </div>
+    <div class="nav-actions">
+        <a href="/canteen" class="back-btn">Kantina Panel</a>
+        <a href="/auth/logout" class="logout-btn">Odjavi se</a>
+    </div>
+</div>
 
-<!-- SUCCESS / ERROR -->
-<% if (error) { %>
-    <div class="alert alert-danger"><%= error %></div>
-<% } %>
-
-<% if (success) { %>
-    <div class="alert alert-success"><%= success %></div>
-<% } %>
-
-
-<!-- FILTER FORM -->
-<form method="GET" style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
-
-    <input type="text" name="user" placeholder="username or email" value="<%= filters.user %>" />
-
-    <select name="role">
-        <option value="">All roles</option>
-        <option value="ucenik" <%= filters.role === "ucenik" ? "selected" : "" %>>Učenik</option>
-        <option value="profesor" <%= filters.role === "profesor" ? "selected" : "" %>>Profesor</option>
-    </select>
-
-    <select name="break">
-        <option value="">All breaks</option>
-        <option value="first_break" <%= filters.break === "first_break" ? "selected" : "" %>>First break</option>
-        <option value="second_break" <%= filters.break === "second_break" ? "selected" : "" %>>Second break</option>
-        <option value="custom" <%= filters.break === "custom" ? "selected" : "" %>>Custom time</option>
-    </select>
-
-    <select name="sort">
-        <option value="pickup_asc" <%= filters.sort === "pickup_asc" ? "selected" : "" %>>Pickup Time ↑</option>
-        <option value="pickup_desc" <%= filters.sort === "pickup_desc" ? "selected" : "" %>>Pickup Time ↓</option>
-        <option value="price_asc" <%= filters.sort === "price_asc" ? "selected" : "" %>>Price ↑</option>
-        <option value="price_desc" <%= filters.sort === "price_desc" ? "selected" : "" %>>Price ↓</option>
-    </select>
-
-    <div class="toggle-container">
-        <span>Completed</span>
-        <input type="checkbox" name="completed" value="true"
-                <%= filters.completed === "true" ? "checked" : "" %>
-               onchange="this.form.submit()">
+<div class="canteen-orders-container">
+    <div class="page-header">
+        <div class="page-header-card">
+            <h1 class="page-title">Sve narudžbe</h1>
+        </div>
     </div>
 
-    <button type="submit">Apply</button>
 
-    <a href="/canteen/orders"><button type="button">Clear Filters</button></a>
-</form>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="error-message">
+            <span><%= error %></span>
+            <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+    <% } %>
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="success-message">
+            <span><%= success %></span>
+            <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+    <% } %>
 
-<div class="accordion mb-4" id="breakAccordion">
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="headingBreaks">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBreaks">
-                Pregled odmora (sumirano)
-            </button>
-        </h2>
+    <form method="GET" class="filter-bar" autocomplete="off">
+        <div class="filter-group">
+            <label for="filterUsername">Korisničko ime ili email</label>
+            <input type="text" id="filterUsername" name="username" class="filter-input" placeholder="Pretraži po imenu ili email-u..." value="<%= filters.username || '' %>">
+        </div>
 
-        <div id="collapseBreaks" class="accordion-collapse collapse" data-bs-parent="#breakAccordion">
-            <div class="accordion-body">
+        <div class="filter-group custom-select-wrapper">
+            <label for="roleSelect">Uloga</label>
+            <div class="custom-select" id="roleSelect">
+                <span class="selected-text">Sve uloge</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <input type="hidden" name="role" id="roleInput" value="<%= filters.role || '' %>">
+        </div>
 
-                <!-- PRVI ODMOR -->
-                <div class="border rounded p-3 mb-4">
-                    <h5 class="mb-3">📌 Prvi odmor</h5>
+        <div class="filter-group custom-select-wrapper">
+            <label for="breakSelect">Odmor</label>
+            <div class="custom-select" id="breakSelect">
+                <span class="selected-text">Svi odmori</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <input type="hidden" name="break" id="breakInput" value="<%= filters.break || '' %>">
+        </div>
 
-                    <% if (breakReports.first_break.items.length === 0) { %>
-                        <p class="text-muted">Nema aktivnih narudžbi za prvi odmor.</p>
-                    <% } else { %>
+        <div class="filter-group custom-select-wrapper">
+            <label for="sortSelect">Sortiraj</label>
+            <div class="custom-select" id="sortSelect">
+                <span class="selected-text">Vrijeme preuzimanja ↑</span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <input type="hidden" name="sort" id="sortInput" value="<%= filters.sort || 'pickup_asc' %>">
+        </div>
 
-                        <table class="table table-sm">
-                            <thead>
-                            <tr>
-                                <th>Artikal</th>
-                                <th>Količina</th>
-                                <th>Ukupno</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <% breakReports.first_break.items.forEach(item => { %>
-                                <tr>
-                                    <td><%= item.item_name %></td>
-                                    <td><%= item.total_quantity %></td>
-                                    <td><%= Number(item.total_revenue).toFixed(2) %> KM</td>
-                                </tr>
-                            <% }) %>
-                            </tbody>
-                        </table>
+        <div class="filter-group custom-select-wrapper">
+            <label for="pageSizeSelect">Po stranici</label>
+            <div class="custom-select" id="pageSizeSelect">
+                <span class="selected-text"><%= pageSize %></span>
+                <i class="bi bi-chevron-down arrow"></i>
+            </div>
+            <input type="hidden" name="pageSize" id="pageSizeInput" value="<%= pageSize %>">
+        </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <strong>Ukupna zarada: <%= Number(breakReports.first_break.total).toFixed(2) %> KM</strong>
+        <div class="toggle-switch-container">
+            <label for="showCompleted">Prikaži završene</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="showCompleted" name="showCompleted" value="true" <%= filters.showCompleted ? 'checked' : '' %>>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
 
-                            <form action="/canteen/orders/complete/first_break" method="POST">
-                                <button class="btn btn-success btn-sm">Kompletiraj prvi odmor</button>
-                            </form>
+        <div class="filter-actions">
+            <button type="submit" class="filter-btn"><i class="bi bi-funnel-fill"></i> Filter</button>
+            <a href="/canteen/orders" class="clear-btn">Očisti</a>
+        </div>
+    </form>
+
+    <div class="accordion" id="breakAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingBreaks">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBreaks">
+                    Pregled odmora (sumirano)
+                </button>
+            </h2>
+            <div id="collapseBreaks" class="accordion-collapse collapse" data-bs-parent="#breakAccordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-lg-6 mb-4 mb-lg-0">
+                            <div class="break-summary-card">
+                                <h5><i class="bi bi-cup-straw"></i> Prvi odmor</h5>
+                                <% if (breakReports.first_break.items.length === 0) { %>
+                                    <p class="text-muted">Nema aktivnih narudžbi.</p>
+                                <% } else { %>
+                                    <table class="table table-borderless table-sm">
+                                        <tbody>
+                                        <% breakReports.first_break.items.forEach(item => { %>
+                                            <tr>
+                                                <td><%= item.item_name %></td>
+                                                <td class="text-end"><strong>x<%= item.total_quantity %></strong></td>
+                                                <td class="text-end"><%= Number(item.total_revenue).toFixed(2) %> KM</td>
+                                            </tr>
+                                        <% }) %>
+                                        </tbody>
+                                    </table>
+                                    <div class="break-summary-footer">
+                                        <strong>Ukupno: <%= Number(breakReports.first_break.total).toFixed(2) %> KM</strong>
+                                        <form action="/canteen/orders/complete/first_break" method="POST">
+                                            <button class="btn btn-success btn-sm">Kompletiraj odmor</button>
+                                        </form>
+                                    </div>
+                                <% } %>
+                            </div>
                         </div>
-                    <% } %>
-                </div>
-
-                <!-- DRUGI ODMOR -->
-                <div class="border rounded p-3">
-                    <h5 class="mb-3">📌 Drugi odmor</h5>
-
-                    <% if (breakReports.second_break.items.length === 0) { %>
-                        <p class="text-muted">Nema aktivnih narudžbi za drugi odmor.</p>
-                    <% } else { %>
-
-                        <table class="table table-sm">
-                            <thead>
-                            <tr>
-                                <th>Artikal</th>
-                                <th>Količina</th>
-                                <th>Ukupno</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <% breakReports.second_break.items.forEach(item => { %>
-                                <tr>
-                                    <td><%= item.item_name %></td>
-                                    <td><%= item.total_quantity %></td>
-                                    <td><%= Number(item.total_revenue).toFixed(2) %> KM</td>
-                                </tr>
-                            <% }) %>
-                            </tbody>
-                        </table>
-
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <strong>Ukupna zarada: <%= Number(breakReports.second_break.total).toFixed(2) %> KM</strong>
-
-                            <form action="/canteen/orders/complete/second_break" method="POST">
-                                <button class="btn btn-success btn-sm">Kompletiraj drugi odmor</button>
-                            </form>
+                        <div class="col-lg-6">
+                            <div class="break-summary-card">
+                                <h5><i class="bi bi-cup-hot"></i> Drugi odmor</h5>
+                                <% if (breakReports.second_break.items.length === 0) { %>
+                                    <p class="text-muted">Nema aktivnih narudžbi.</p>
+                                <% } else { %>
+                                    <table class="table table-borderless table-sm">
+                                        <tbody>
+                                        <% breakReports.second_break.items.forEach(item => { %>
+                                            <tr>
+                                                <td><%= item.item_name %></td>
+                                                <td class="text-end"><strong>x<%= item.total_quantity %></strong></td>
+                                                <td class="text-end"><%= Number(item.total_revenue).toFixed(2) %> KM</td>
+                                            </tr>
+                                        <% }) %>
+                                        </tbody>
+                                    </table>
+                                    <div class="break-summary-footer">
+                                        <strong>Ukupno: <%= Number(breakReports.second_break.total).toFixed(2) %> KM</strong>
+                                        <form action="/canteen/orders/complete/second_break" method="POST">
+                                            <button class="btn btn-success btn-sm">Kompletiraj odmor</button>
+                                        </form>
+                                    </div>
+                                <% } %>
+                            </div>
                         </div>
-                    <% } %>
-
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- ORDER LIST -->
-<% orders.forEach(order => { %>
-    <div class="order-box">
+    <% if (orders.length > 0) { %>
+        <% orders.forEach(order => { %>
+            <div class="order-card">
+                <div class="order-header">
+                <span class="user-info">
+                    <%= order.User.username %> <span class="role"><%= order.User.role %></span>
+                </span>
+                    <span class="order-date"><%= new Date(order.created_at).toLocaleDateString('bs-BA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+                </div>
+                <div class="order-body">
+                    <div class="order-details">
+                        <div class="info-group">
+                            <div class="info-label">Kontakt</div>
+                            <div class="info-value"><i class="bi bi-envelope"></i> <%= order.User.email %></div>
+                            <% if (order.User.phone_number) { %>
+                                <div class="info-value"><i class="bi bi-phone"></i> <%= order.User.phone_number %></div>
+                            <% } %>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Vrijeme preuzimanja</div>
+                            <div class="info-value">
+                                <% if (order.pickup_time) { %>
+                                    <i class="bi bi-clock"></i> <%= order.pickup_time %>
+                                <% } else if (order.break_slot) { %>
+                                    <i class="bi bi-bell"></i> <%= order.break_slot === "first_break" ? "Prvi odmor" : "Drugi odmor" %>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Ukupan iznos</div>
+                            <div class="total-amount"><%= order.total_amount %> KM</div>
+                        </div>
+                    </div>
+                    <div class="order-items-section">
+                        <h3 class="items-list-title">Stavke narudžbe</h3>
+                        <ul class="order-items-list">
+                            <% order.OrderItems.forEach(item => { %>
+                                <li class="order-item">
+                                    <span class="item-name"><span class="quantity"><%= item.quantity %>x</span> <%= item.MenuItem.name %></span>
+                                    <span class="item-price"><%= item.unit_price %> KM</span>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                </div>
+                <div class="order-footer">
+                    <div class="order-status <%= order.completed ? 'completed' : 'active' %>">
+                        Status: <%= order.completed ? "Završeno" : "Aktivno" %>
+                    </div>
+                    <form action="/canteen/orders/toggle-status/<%= order.id %>" method="POST">
+                        <button class="btn-toggle-status <%= order.completed ? 'completed' : 'active' %>">
+                            <%= order.completed ? "Vrati na aktivno" : "Označi kao završeno" %>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <div class="no-orders-card">
+            <i class="bi bi-receipt"></i>
+            <p>Nema narudžbi koje odgovaraju filterima.</p>
+        </div>
+    <% } %>
 
-        <p>
-            <strong>User:</strong> <%= order.User.username %> (<%= order.User.email %>)<br>
-            <strong>Phone:</strong> <%= order.User.phone_number %><br>
-            <strong>Role:</strong> <%= order.User.role %>
-        </p>
-
-        <p>
-            <strong>Date:</strong> <%= order.created_at.toLocaleString() %><br>
-
-            <% if (order.pickup_time) { %>
-                <strong>Pickup:</strong> <%= order.pickup_time %><br>
-            <% } %>
-
-            <% if (order.break_slot) { %>
-                <strong>Break:</strong>
-                <%= order.break_slot === "first_break"
-                        ? "First Break (10:25 - 10:45)"
-                        : "Second Break (15:40 - 16:00)" %><br>
-            <% } %>
-
-            <strong>Total:</strong> <%= order.total_amount %> KM<br>
-
-            <strong>Status:</strong>
-            <% if (order.completed) { %>
-                <span style="color:green; font-weight:bold;">Completed</span>
-            <% } else { %>
-                <span style="color:red; font-weight:bold;">Active</span>
-            <% } %>
-        </p>
-
-        <strong>Items:</strong>
-        <ul class="order-items">
-            <% order.OrderItems.forEach(item => { %>
-                <li>
-                    <%= item.quantity %>× <%= item.MenuItem.name %> — <%= item.unit_price %> KM
-                </li>
-            <% }) %>
-        </ul>
-
-        <!-- BUTTON TO TOGGLE STATUS -->
-        <form action="/canteen/orders/toggle-status/<%= order.id %>" method="POST">
-            <button class="btn-status <%= order.completed ? 'completed' : '' %>">
-                <%= order.completed ? "Vrati na aktivno" : "Označi kao završeno" %>
-            </button>
-        </form>
-
+    <div class="pagination-container">
+        <nav class="pagination-controls" aria-label="Pagination">
+            <a <% if (page > 1) { %>href="?<%= new URLSearchParams({ ...filters, pageSize, page: page - 1 }).toString() %>"<% } %> class="page-btn icon-btn <%= (page <= 1) ? 'disabled' : '' %>">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            <span class="page-info">Stranica <%= page %></span>
+            <a <% if (hasMore) { %>href="?<%= new URLSearchParams({ ...filters, pageSize, page: page + 1 }).toString() %>"<% } %> class="page-btn icon-btn <%= (!hasMore) ? 'disabled' : '' %>">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </nav>
     </div>
-<% }) %>
-
-<!-- PAGINATION -->
-<div style="display:flex; justify-content:center; gap:10px; margin-top:20px;">
-    <%
-    const queryString = Object.entries(filters)
-            .filter(([k,v]) => v && v !== "")
-            .map(([k,v]) => `${k}=${v}`)
-            .join("&");
-    %>
-
-    <% if (page > 1) { %>
-        <a href="/canteen/orders?<%= queryString %>&page=<%= page - 1 %>&pageSize=<%= pageSize %>">
-            <button>Previous</button>
-        </a>
-    <% } else { %>
-        <button disabled>Previous</button>
-    <% } %>
-
-    <% if (hasMore) { %>
-        <a href="/canteen/orders?<%= queryString %>&page=<%= page + 1 %>&pageSize=<%= pageSize %>">
-            <button>Next</button>
-        </a>
-    <% } else { %>
-        <button disabled>Next</button>
-    <% } %>
 </div>
 
-<a href="/canteen">Back to Dashboard</a>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div class="custom-options" id="roleOptions">
+    <div class="custom-option" data-value="">Sve uloge</div>
+    <div class="custom-option" data-value="ucenik">Učenik</div>
+    <div class="custom-option" data-value="profesor">Profesor</div>
+</div>
+<div class="custom-options" id="breakOptions">
+    <div class="custom-option" data-value="">Svi odmori</div>
+    <div class="custom-option" data-value="first_break">Prvi odmor</div>
+    <div class="custom-option" data-value="second_break">Drugi odmor</div>
+    <div class="custom-option" data-value="custom">Posebno vrijeme</div>
+</div>
+<div class="custom-options" id="sortOptions">
+    <div class="custom-option" data-value="pickup_asc">Vrijeme preuzimanja ↑</div>
+    <div class="custom-option" data-value="pickup_desc">Vrijeme preuzimanja ↓</div>
+    <div class="custom-option" data-value="price_asc">Cijena ↑</div>
+    <div class="custom-option" data-value="price_desc">Cijena ↓</div>
+</div>
+<div class="custom-options" id="pageSizeOptions">
+    <div class="custom-option" data-value="10">10</div>
+    <div class="custom-option" data-value="20">20</div>
+    <div class="custom-option" data-value="50">50</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/javascripts/canteen/orders.js"></script>
+</body>
+</html>
