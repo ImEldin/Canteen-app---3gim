@@ -4,8 +4,10 @@ const orderService = require("../services/orderService");
 module.exports = {
     async getMenu(req, res) {
         try {
+            const {success} = req.query;
             const [menu, tags] = await menuService.getMenuItems({});
-            res.render("canteen/menu", { menu, tags, error: null });
+            const user = req.session.user;
+            res.render("canteen/menu", { menu, tags, error: null, user, success: success || null});
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Došlo je do greške pri učitavanju menija.' });

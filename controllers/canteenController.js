@@ -52,7 +52,8 @@ module.exports = {
         try {
             if (!req.body.items || !Array.isArray(req.body.items) || req.body.items.length === 0) {
                 const [menu, tags] = await menuService.getMenuItems({});
-                return res.render('canteen/menu', { error: 'Meni mora sadržavati barem jednu stavku.', menu, tags, items: [] });
+                const user = req.session.user;
+                return res.render('canteen/menu', { error: 'Meni mora sadržavati barem jednu stavku.', menu, tags, items: [], user });
             }
 
             const items = req.body.items;
@@ -68,7 +69,7 @@ module.exports = {
                 });
             }
             await menuService.createMenu(items);
-            res.redirect("/canteen/menu");
+            res.redirect("/canteen/menu?success=Meni je uspješno dorađen.");
 
         } catch (err) {
             console.error(err);

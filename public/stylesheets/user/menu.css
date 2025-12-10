@@ -466,6 +466,13 @@
     color: var(--white);
 }
 
+.item-description {
+    color: #64748b;
+    margin: 5px 0 12px;
+    line-height: 0.3;
+    font-size: medium;
+}
+
 @media (max-width: 1200px) {
     .menu-layout {
         grid-template-columns: 1fr 320px;
