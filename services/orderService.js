@@ -172,6 +172,12 @@ module.exports = {
                 where.pickup_time = { [Op.ne]: null };
             }
 
+            if (filters.completed === "true") {
+                where.completed = true;
+            } else {
+                where.completed = false;
+            }
+
             let orderBy = null;
             if (!filters.sort || filters.sort === "pickup_asc") {
                 orderBy = [["pickup_time", "ASC"]];
@@ -204,6 +210,30 @@ module.exports = {
         } catch (err) {
             console.error("Error fetching all orders:", err);
             throw new Error("Nije moguće dohvatiti narudžbe.");
+        }
+    },
+
+    async toggleStatus(orderId) {
+        try {
+            const order = await orderRepository.getOrderById(orderId);
+
+            if (!order) {
+                return { error: "Narudžba nije pronađena." };
+            }
+
+            const newStatus = order.completed ? false : true;
+
+            await orderRepository.updateStatus(orderId, newStatus);
+
+            return {
+                message: newStatus
+                    ? "Narudžba je označena kao završena."
+                    : "Narudžba je vraćena na aktivnu."
+            };
+
+        } catch (err) {
+            console.error(err);
+            return { error: "Greška pri ažuriranju statusa." };
         }
     }
 };

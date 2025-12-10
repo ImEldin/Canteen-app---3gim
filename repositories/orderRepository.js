@@ -121,5 +121,24 @@ module.exports = {
             console.error("Error fetching all orders:", err);
             throw new Error("Nije moguće dohvatiti narudžbe.");
         }
+    },
+
+    async updateStatus(id, completed) {
+        try {
+            const [updated] = await Order.update(
+                { completed },
+                { where: { id } }
+            );
+
+            if (updated === 0) {
+                throw new Error("Narudžba nije pronađena ili nije ažurirana.");
+            }
+
+            return true;
+
+        } catch (err) {
+            console.error(`Error updating status for order ${id}:`, err);
+            throw new Error("Nije moguće ažurirati status narudžbe.");
+        }
     }
 };

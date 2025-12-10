@@ -405,6 +405,52 @@
     }
 }
 
+.ready-btn-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: .25rem;
+    text-align: left;
+}
+
+.ready-btn-wrapper .btn {
+    padding: .25rem .5rem;
+    font-size: .85rem;
+    border-width: 1px;
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+}
+
+.ready-btn-wrapper .btn:hover,
+.ready-btn-wrapper .btn:focus,
+.ready-btn-wrapper .btn:active {
+    background-color: transparent !important;
+    color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    outline: none !important;
+    cursor: auto;
+}
+
+
+@media (max-width: 576px) {
+    .order-details {
+        flex-direction: column !important;
+        align-items: flex-start;
+    }
+    .pickup-info {
+        margin-bottom: .25rem;
+    }
+    .ready-btn-wrapper .btn {
+        font-size: .8rem;
+        padding: .2rem .4rem;
+    }
+}
+
+
 @media (max-width: 576px) {
     .page-header-card {
         padding: 15px;

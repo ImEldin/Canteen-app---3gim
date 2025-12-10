@@ -21,11 +21,14 @@ module.exports = {
             const page = parseInt(req.query.page) || 1;
             const pageSize = parseInt(req.query.pageSize) || 20;
 
+            const { error, success } = req.query;
+
             const filters = {
                 user: req.query.user || "",
                 role: req.query.role || "",
                 break: req.query.break || "",
-                sort: req.query.sort || "newest"
+                sort: req.query.sort || "newest",
+                completed: req.query.completed === "true" ? "true" : "false"
             };
 
             const  { orders, hasMore }  = await orderService.getAllOrders({
@@ -39,12 +42,32 @@ module.exports = {
                 filters,
                 page,
                 pageSize,
-                hasMore
+                hasMore,
+                error,
+                success
             });
 
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Neuspješno učitavanje narudžbi.'});
+        }
+    },
+
+    async toggleOrderStatus(req, res) {
+        try {
+            const orderId = req.params.id;
+
+            const result = await orderService.toggleStatus(orderId);
+
+            if (result.error) {
+                return res.redirect(`/canteen/orders?error=${encodeURIComponent(result.error)}`);
+            }
+
+            return res.redirect(`/canteen/orders?success=${encodeURIComponent(result.message)}`);
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('error', { message: 'Greška pri promjeni statusa narudžbe.' });
         }
     },
 

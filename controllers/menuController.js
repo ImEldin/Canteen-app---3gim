@@ -104,7 +104,7 @@ module.exports = {
             const { break_slot, pickup_time } = req.body;
 
             if (cart.length === 0) {
-                return res.redirect("/user/menu");
+                return res.redirect("/user/menu?error=Korpa je prazna");
             }
 
             await orderService.placeOrder(userId, cart, {
@@ -113,7 +113,7 @@ module.exports = {
             });
 
             req.session.cart = [];
-            res.redirect("/user/orders");
+            return res.redirect("/user/orders?success=Narudžba je uspješno kreirana!");
 
         } catch (error) {
             console.error("Greška pri kreiranju narudžbe", error);

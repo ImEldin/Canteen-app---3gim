@@ -9,52 +9,96 @@
         background: #fafafa;
         font-size: 14px;
     }
-    .order-header {
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 6px;
-    }
     .order-items li {
         margin-left: 10px;
     }
+    .toggle-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+    .toggle-container input {
+        transform: scale(1.3);
+    }
+    .btn-status {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        background: #6c5ce7;
+        color: white;
+    }
+    .btn-status.completed {
+        background: #00b894;
+    }
+    .alert {
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+    }
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+    }
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+    }
 </style>
 
-<form method="GET" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+<!-- SUCCESS / ERROR -->
+<% if (error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<% if (success) { %>
+    <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<!-- FILTER FORM -->
+<form method="GET" style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+
     <input type="text" name="user" placeholder="username or email" value="<%= filters.user %>" />
+
     <select name="role">
         <option value="">All roles</option>
         <option value="ucenik" <%= filters.role === "ucenik" ? "selected" : "" %>>Učenik</option>
         <option value="profesor" <%= filters.role === "profesor" ? "selected" : "" %>>Profesor</option>
     </select>
+
     <select name="break">
         <option value="">All breaks</option>
         <option value="first_break" <%= filters.break === "first_break" ? "selected" : "" %>>First break</option>
         <option value="second_break" <%= filters.break === "second_break" ? "selected" : "" %>>Second break</option>
         <option value="custom" <%= filters.break === "custom" ? "selected" : "" %>>Custom time</option>
     </select>
+
     <select name="sort">
         <option value="pickup_asc" <%= filters.sort === "pickup_asc" ? "selected" : "" %>>Pickup Time ↑</option>
         <option value="pickup_desc" <%= filters.sort === "pickup_desc" ? "selected" : "" %>>Pickup Time ↓</option>
         <option value="price_asc" <%= filters.sort === "price_asc" ? "selected" : "" %>>Price ↑</option>
         <option value="price_desc" <%= filters.sort === "price_desc" ? "selected" : "" %>>Price ↓</option>
     </select>
-    <select name="pageSize">
-        <option value="10" <%= pageSize == 10 ? "selected" : "" %>>10</option>
-        <option value="20" <%= pageSize == 20 ? "selected" : "" %>>20</option>
-        <option value="50" <%= pageSize == 50 ? "selected" : "" %>>50</option>
-        <option value="100" <%= pageSize == 100 ? "selected" : "" %>>100</option>
-    </select>
+
+    <div class="toggle-container">
+        <span>Completed</span>
+        <input type="checkbox" name="completed" value="true"
+                <%= filters.completed === "true" ? "checked" : "" %>
+               onchange="this.form.submit()">
+    </div>
+
     <button type="submit">Apply</button>
-    <a href="/canteen/orders">
-        <button type="button">Clear Filters</button>
-    </a>
+
+    <a href="/canteen/orders"><button type="button">Clear Filters</button></a>
 </form>
 
+<!-- ORDER LIST -->
 <% orders.forEach(order => { %>
     <div class="order-box">
+
         <p>
-            <strong>User:</strong> <%= order.User.username %>
-            (<%= order.User.email %>)<br>
+            <strong>User:</strong> <%= order.User.username %> (<%= order.User.email %>)<br>
             <strong>Phone:</strong> <%= order.User.phone_number %><br>
             <strong>Role:</strong> <%= order.User.role %>
         </p>
@@ -68,31 +112,46 @@
 
             <% if (order.break_slot) { %>
                 <strong>Break:</strong>
-                <%= order.break_slot === "first_break" ? "First Break (10:25 - 10:45)" : "Second Break (15:40 - 16:00)" %><br>
+                <%= order.break_slot === "first_break"
+                        ? "First Break (10:25 - 10:45)"
+                        : "Second Break (15:40 - 16:00)" %><br>
             <% } %>
 
-            <strong>Total:</strong> <%= order.total_amount %> KM
+            <strong>Total:</strong> <%= order.total_amount %> KM<br>
+
+            <strong>Status:</strong>
+            <% if (order.completed) { %>
+                <span style="color:green; font-weight:bold;">Completed</span>
+            <% } else { %>
+                <span style="color:red; font-weight:bold;">Active</span>
+            <% } %>
         </p>
 
         <strong>Items:</strong>
         <ul class="order-items">
             <% order.OrderItems.forEach(item => { %>
                 <li>
-                    <%= item.quantity %>× <%= item.MenuItem.name %>
-                    — <%= item.unit_price %> KM
+                    <%= item.quantity %>× <%= item.MenuItem.name %> — <%= item.unit_price %> KM
                 </li>
             <% }) %>
         </ul>
 
+        <!-- BUTTON TO TOGGLE STATUS -->
+        <form action="/canteen/orders/toggle-status/<%= order.id %>" method="POST">
+            <button class="btn-status <%= order.completed ? 'completed' : '' %>">
+                <%= order.completed ? "Vrati na aktivno" : "Označi kao završeno" %>
+            </button>
+        </form>
+
     </div>
 <% }) %>
 
+<!-- PAGINATION -->
 <div style="display:flex; justify-content:center; gap:10px; margin-top:20px;">
-
     <%
     const queryString = Object.entries(filters)
-            .filter(([key, value]) => value && value !== "")
-            .map(([key, value]) => `${key}=${value}`)
+            .filter(([k,v]) => v && v !== "")
+            .map(([k,v]) => `${k}=${v}`)
             .join("&");
     %>
 
@@ -111,7 +170,6 @@
     <% } else { %>
         <button disabled>Next</button>
     <% } %>
-
 </div>
 
 <a href="/canteen">Back to Dashboard</a>

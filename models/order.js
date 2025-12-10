@@ -9,7 +9,11 @@ module.exports = (sequelize, DataTypes) => {
             pickup_time: DataTypes.TIME,
             break_slot: DataTypes.TEXT,
             created_at: DataTypes.DATE,
-            updated_at: DataTypes.DATE
+            updated_at: DataTypes.DATE,
+            completed: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false
+            },
         },
         {
             tableName: "orders",
