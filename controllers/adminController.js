@@ -213,7 +213,9 @@ module.exports = {
         try {
             const result = await adminService.resetPassword(req.params.id);
             req.session.tempPassword = result.tempPassword;
-            res.redirect(`/admin/user/${req.params.id}?success=Lozinka uspješno resetovana.`);
+            req.session.save(() => {
+                res.redirect(`/admin/user/${req.params.id}?success=Lozinka uspješno resetovana.`);
+            });
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Greška pri resetovanju lozinke.' });

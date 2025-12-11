@@ -133,8 +133,16 @@ module.exports = {
 
             const tempPassword = generateTempPassword();
             const hashedPassword = await bcrypt.hash(tempPassword, 10);
+            const user = await userRepository.findById(userId);
 
             await userRepository.updateUser(userId, { password: hashedPassword, must_change_password: true });
+
+            const temp = tempPasswordRepository.getByEmail(user.email);
+            if (temp) {
+                await tempPasswordRepository.deleteByEmail(user.email);
+            }
+
+            await tempPasswordRepository.saveTempPassword(user.email, tempPassword);
 
             return { tempPassword };
         } catch (err) {
