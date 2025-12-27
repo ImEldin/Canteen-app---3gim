@@ -13,7 +13,9 @@ const authRouter = require('./routes/auth');
 const adminRouter = require('./routes/admin');
 const userRouter = require('./routes/user');
 const canteenRouter = require('./routes/canteen');
+const realtimeRouter = require('./routes/realtime');
 const scheduleDailyCleanup = require("./utils/scheduler");
+
 
 var app = express();
 
@@ -49,6 +51,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/', realtimeRouter);
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 app.use('/user', userRouter);

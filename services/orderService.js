@@ -1,6 +1,7 @@
 const orderRepository = require("../repositories/orderRepository");
 const { Op } = require("sequelize");
 const util = require("util");
+const sseNotification = require("../realtime/sse");
 
 module.exports = {
     async placeOrder(userId, cart, pickup = {}) {
@@ -224,6 +225,10 @@ module.exports = {
             const newStatus = order.completed ? false : true;
 
             await orderRepository.updateStatus(orderId, newStatus);
+
+            if (newStatus === true) {
+                sseNotification.notifyUser(order.user_id);
+            }
 
             return {
                 message: newStatus

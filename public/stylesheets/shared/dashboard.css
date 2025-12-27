@@ -109,6 +109,35 @@
     z-index: 1;
 }
 
+.notification-dot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 14px;
+    height: 14px;
+    background-color: #ff3b3b;
+    border-radius: 50%;
+    border: 2px solid white;
+    z-index: 3;
+}
+
+.dashboard-card.has-notification {
+    outline: 2px solid rgba(255, 59, 59, 0.5);
+    box-shadow:
+            0 20px 60px rgba(155, 135, 245, 0.3),
+            0 0 0 4px rgba(255, 59, 59, 0.12);
+}
+
+.notification-dot {
+    animation: notifPulse 1.4s infinite ease-in-out;
+}
+
+@keyframes notifPulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
 @media (max-width: 700px) {
     .cards-wrapper {
         flex-direction: column;
@@ -136,3 +165,4 @@
         display: none;
     }
 }
+

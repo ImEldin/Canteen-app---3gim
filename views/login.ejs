@@ -31,6 +31,12 @@
                             <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
                         </div>
                     <% } %>
+                    <% if (typeof success !== 'undefined' && success) { %>
+                        <div class="success-message">
+                            <span><strong>Uspijeh!</strong> <%= success %></span>
+                            <button type="button" class="close-btn-success" onclick="this.parentElement.style.display='none'">&times;</button>
+                        </div>
+                    <% } %>
                     <form action="/auth/login" method="POST">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email adresa</label>

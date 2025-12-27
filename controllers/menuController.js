@@ -1,5 +1,6 @@
 const menuService = require("../services/menuService");
 const orderService = require("../services/orderService");
+const sseNotification = require("../realtime/sse");
 
 module.exports = {
     async getMenu(req, res) {
@@ -111,6 +112,8 @@ module.exports = {
                 break_slot: break_slot || null,
                 pickup_time: pickup_time || null
             });
+            sseNotification.notifyCanteen()
+
 
             req.session.cart = [];
             return res.redirect("/user/orders?success=Narudžba je uspješno kreirana!");

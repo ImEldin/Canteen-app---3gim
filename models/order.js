@@ -14,6 +14,14 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false
             },
+            seen_by_canteen: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false
+            },
+            seen_by_user: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false
+            },
         },
         {
             tableName: "orders",

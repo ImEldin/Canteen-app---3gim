@@ -33,9 +33,13 @@
             <div class="card-title">Meni</div>
             <div class="card-description">Upravljanje menijem</div>
         </a>
-        <a href="/canteen/Orders" class="dashboard-card">
+        <a href="/canteen/Orders" class="dashboard-card <%= hasNotification ? 'has-notification' : '' %>">
             <div class="card-icon">
                 <img src="/images/cart.png" alt="My Orders">
+
+                <% if (hasNotification) { %>
+                    <span class="notification-dot"></span>
+                <% } %>
             </div>
             <div class="card-title">Pregled narudžbi</div>
             <div class="card-description">Lista svih zaprimljenih narudžbi</div>
@@ -44,6 +48,12 @@
 </div>
 </body>
 <script>
+    const es = new EventSource("/sse");
+
+    es.addEventListener("orders_changed", () => {
+        window.location.reload();
+    });
+
     window.addEventListener('load', function() {
         document.getElementById('loading-overlay').classList.add('hidden');
     });

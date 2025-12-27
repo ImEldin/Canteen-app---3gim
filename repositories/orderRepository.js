@@ -16,7 +16,10 @@ module.exports = {
                 user_id: userId,
                 total_amount: totalAmount,
                 pickup_time: pickup.pickup_time || null,
-                break_slot: pickup.break_slot || null
+                break_slot: pickup.break_slot || null,
+                completed: false,
+                seenByCanteen: false,
+                seenByUser: false
             });
 
             for (const item of items) {
@@ -204,5 +207,76 @@ module.exports = {
             console.error(`Error completing break ${slot}:`, err);
             throw new Error("Nije moguće označiti odmor kao završen.");
         }
-    }
+    },
+
+    async hasNewForCanteen() {
+        try {
+            const count = await Order.count({
+                where: {
+                    completed: false,
+                    seen_by_canteen: false
+                }
+            });
+            return count > 0;
+
+        } catch (err) {
+            console.error("Error checking new orders for canteen:", err);
+            throw new Error("Nije moguće provjeriti nove narudžbe za kantinu.");
+        }
+    },
+
+    async hasReadyForUser(userId) {
+        try {
+            const count = await Order.count({
+                where: {
+                    user_id: userId,
+                    completed: true,
+                    seen_by_user: false
+                }
+            });
+            return count > 0;
+
+        } catch (err) {
+            console.error(`Error checking ready orders for user ${userId}:`, err);
+            throw new Error("Nije moguće provjeriti spremne narudžbe korisnika.");
+        }
+    },
+
+    async ackCanteenOrders() {
+        try {
+            await Order.update(
+                { seen_by_canteen: true },
+                {
+                    where: {
+                        completed: false,
+                        seen_by_canteen: false
+                    }
+                }
+            );
+
+        } catch (err) {
+            console.error("Error acknowledging canteen orders:", err);
+            throw new Error("Nije moguće označiti narudžbe kantine kao viđene.");
+        }
+    },
+
+    async ackUserOrders(userId) {
+        try {
+            await Order.update(
+                { seen_by_user: true },
+                {
+                    where: {
+                        user_id: userId,
+                        completed: true,
+                        seen_by_user: false
+                    }
+                }
+            );
+
+        } catch (err) {
+            console.error(`Error acknowledging user orders for user ${userId}:`, err);
+            throw new Error("Nije moguće označiti narudžbe korisnika kao viđene.");
+        }
+    },
+
 };

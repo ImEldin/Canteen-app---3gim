@@ -4,7 +4,8 @@ const querystring = require('querystring');
 module.exports = {
     showLoginPage(req, res) {
         try {
-            res.render('login', { error: null });
+            const success = req.query.success || null;
+            res.render('login', { error: null, success });
         } catch (err) {
             console.error(err);
             res.status(500).render('error', { message: 'Neuspješno učitavanje stranice za prijavu.' });
@@ -154,7 +155,9 @@ module.exports = {
 
             req.session.user.must_change_password = false;
 
-            return res.redirect('/');
+            return res.redirect(
+                '/auth/login?success=Šifra je uspješno promijenjena.'
+            );
 
         } catch (err) {
             console.error(err);
