@@ -10,8 +10,6 @@ function register(req, res) {
     res.setHeader("Connection", "keep-alive");
     res.flushHeaders?.();
 
-    res.write(`event: connected\ndata: {}\n\n`);
-
     if (user.role === "kantina") {
         canteenClients.add(res);
     } else {
@@ -29,7 +27,7 @@ function register(req, res) {
 
 function notifyCanteen() {
     canteenClients.forEach(res => {
-        res.write(`event: orders_changed\ndata: {}\n\n`);
+        res.write(`event: orders_changed\n\n`);
     });
 }
 
@@ -38,14 +36,8 @@ function notifyUser(userId) {
     if (!set) return;
 
     set.forEach(res => {
-        res.write(`event: orders_changed\ndata: {}\n\n`);
+        res.write(`event: orders_changed\n\n`);
     });
 }
-
-setInterval(() => {
-    const ping = `event: ping\ndata: {}\n\n`;
-    canteenClients.forEach(res => res.write(ping));
-    userClients.forEach(set => set.forEach(res => res.write(ping)));
-}, 15000);
 
 module.exports = { register, notifyCanteen, notifyUser };

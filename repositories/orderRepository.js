@@ -55,7 +55,10 @@ module.exports = {
                         ]
                     }
                 ],
-                order: [["created_at", "DESC"]]
+                order: [
+                    ["completed", "DESC"],
+                    ["created_at", "DESC"]
+                ]
             });
         } catch (err) {
             console.error(`Error fetching orders for user ${userId}:`, err);
