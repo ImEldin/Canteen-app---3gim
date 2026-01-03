@@ -18,6 +18,7 @@ const scheduleDailyCleanup = require("./utils/scheduler");
 
 
 var app = express();
+app.set('trust proxy', 1);
 
 const sessionMiddleware = session({
   store: new pgSession({
