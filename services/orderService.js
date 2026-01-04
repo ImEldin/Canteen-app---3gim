@@ -2,6 +2,7 @@ const orderRepository = require("../repositories/orderRepository");
 const { Op } = require("sequelize");
 const util = require("util");
 const sseNotification = require("../realtime/sse");
+const { now } = require('../utils/time');
 
 module.exports = {
     async placeOrder(userId, cart, pickup = {}) {
@@ -28,13 +29,13 @@ module.exports = {
                     second_break: { hour: 15, minute: 40 }   // drugi odmor
                 };
 
-                const now = new Date();
+                const now = now();
                 const currentHour = now.getHours();
                 if (currentHour < 8 || currentHour >= 16) {
                     throw new Error("Narudžbe se mogu praviti samo između 08:00 i 16:00.");
                 }
                 const breakTime = breakTimes[break_slot];
-                const breakDate = new Date();
+                const breakDate = now();
                 breakDate.setHours(breakTime.hour, breakTime.minute, 0, 0);
 
                 const thirtyMinBeforeBreak = new Date(breakDate.getTime() - 30 * 60 * 1000);
@@ -66,14 +67,14 @@ module.exports = {
                     throw new Error("Vrijeme preuzimanja mora biti između 08:00 i 16:00.");
                 }
 
-                const now = new Date();
+                const now = now();
                 const currentHour = now.getHours();
                 if (currentHour < 8 || currentHour >= 16) {
                     throw new Error("Narudžbe se mogu praviti samo između 08:00 i 16:00.");
                 }
                 const thirtyMinFromNow = new Date(now.getTime() + 30 * 60 * 1000);
 
-                const pickupDate = new Date();
+                const pickupDate = now();
                 pickupDate.setHours(hour, minute, 0, 0);
 
                 if (pickupDate < thirtyMinFromNow) {
@@ -111,12 +112,12 @@ module.exports = {
             const order = await orderRepository.getOrderById(orderId);
             if (!order) throw new Error("Narudžba ne postoji.");
 
-            const now = new Date();
+            const now = now();
 
             if (order.pickup_time) {
                 const [hour, minute] = order.pickup_time.split(":").map(Number);
 
-                const pickupDate = new Date();
+                const pickupDate = now();
                 pickupDate.setHours(hour, minute, 0, 0);
 
                 const thirtyMinBeforePickup = new Date(pickupDate.getTime() - 30 * 60 * 1000);
@@ -134,7 +135,7 @@ module.exports = {
 
                 const bt = breakTimes[order.break_slot];
                 if (bt) {
-                    const breakDate = new Date();
+                    const breakDate = now();
                     breakDate.setHours(bt.hour, bt.minute, 0, 0);
 
                     const thirtyMinBeforeBreak = new Date(breakDate.getTime() - 30 * 60 * 1000);
