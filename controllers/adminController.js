@@ -103,7 +103,7 @@ module.exports = {
 
             if (!user) return res.status(404).render('error', { message: 'Korisnik nije pronađen.' });
 
-            res.render('admin/edit-User', { user, error: null, admin});
+            res.render('admin/edit-user', { user, error: null, admin});
 
         } catch (err) {
             console.error(err);
