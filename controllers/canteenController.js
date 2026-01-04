@@ -1,6 +1,8 @@
 const orderService = require('../services/orderService');
 const menuService = require('../services/menuService');
+const supabase = require('../config/supabase');
 const upload = require('../utils/uploads');
+const crypto = require('crypto');
 
 module.exports = {
 
@@ -91,14 +93,36 @@ module.exports = {
             const items = req.body.items;
 
             if (req.files && req.files.length > 0) {
-                req.files.forEach(file => {
+                for (const file of req.files) {
                     const match = file.fieldname.match(/images\[(\d+)\]/);
+                    if (!match) continue;
 
-                    if (match) {
-                        const index = Number(match[1]);
-                        items[index].image = `/uploads/${file.filename}`;
+                    const index = Number(match[1]);
+
+                    if (!file.mimetype.startsWith('image/')) {
+                        return res.render('canteen/menu', { error: 'Nepodržan format slike.', menu, tags, items, user });
                     }
-                });
+
+                    const ext = file.mimetype.split('/')[1];
+                    const fileName = `${crypto.randomUUID()}.${ext}`;
+
+                    const { error: uploadError } = await supabase.storage
+                        .from('menu-images')
+                        .upload(fileName, file.buffer, {
+                            contentType: file.mimetype
+                        });
+
+                    if (uploadError) {
+                        console.error("Supabase upload error:", uploadError);
+                        return res.render('canteen/menu', { error: 'Greška prilikom spašavanja slike. Pokušajte ponovo.', menu, tags, items, user });
+                    }
+
+                    const { data } = supabase.storage
+                        .from('menu-images')
+                        .getPublicUrl(fileName);
+
+                    items[index].image = data.publicUrl;
+                }
             }
             await menuService.createMenu(items);
             res.redirect("/canteen/menu?success=Meni je uspješno dorađen.");

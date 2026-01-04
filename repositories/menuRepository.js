@@ -1,7 +1,6 @@
 const { MenuItem, Tag } = require("../models");
 const { sequelize } = require("../models");
-const fs = require("fs/promises");
-const path = require("path");
+const supabase = require('../config/supabase');
 
 module.exports = {
     async getAllMenuItems(where = {}, tagWhere = {}, orderBy = null) {
@@ -98,17 +97,20 @@ module.exports = {
                 await item.setTags([]);
 
                 if (item.image_url) {
-                    const filePath = path.join(__dirname, "..", "public", item.image_url);
-
                     try {
-                        await fs.unlink(filePath);
-                        console.log("Deleted image:", filePath);
-                    } catch (err) {
-                        if (err.code !== "ENOENT") {
-                            console.error("Failed to delete image:", filePath, err);
+                        const fileName = item.image_url.split('/').pop();
+
+                        const { error } = await supabase.storage
+                            .from('menu-images')
+                            .remove([fileName]);
+
+                        if (error) {
+                            console.error('Supabase image delete error:', error);
                         } else {
-                            console.warn("Image not found, skipping:", filePath);
+                            console.log('Deleted Supabase image:', fileName);
                         }
+                    } catch (err) {
+                        console.error('Failed to delete Supabase image:', err);
                     }
                 }
 

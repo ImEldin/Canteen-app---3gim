@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fileNameDisplay.textContent = file.name;
         } else {
             const existingImageUrl = input.closest('.menu-item-form').querySelector('input[type="hidden"][name*="[image]"]').value;
-            preview.src = existingImageUrl || '/images/placeholder.png';
+            preview.src = existingImageUrl || '/images/default-food.png';
             fileNameDisplay.textContent = existingImageUrl ? existingImageUrl.split('/').pop() : 'Nijedna slika nije izabrana.';
         }
     };

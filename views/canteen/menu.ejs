@@ -60,7 +60,7 @@
             <div class="menu-display-card">
                 <% menu.forEach(item => { %>
                     <div class="menu-item-display">
-                        <img src="<%= item.image_url || '/images/default-food.png' %>" alt="<%= item.name %>" class="item-image-display">
+                        <img src="<%= item.image_url %>" alt="<%= item.name %>" class="item-image-display" onerror="this.onerror=null; this.src='/images/default-food.png';">
                         <div class="item-details-display">
                             <div class="item-name-display"><%= item.name %></div>
                             <div class="item-price-display"><%= item.price %> KM</div>
