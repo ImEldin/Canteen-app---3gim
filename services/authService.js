@@ -129,6 +129,10 @@ module.exports = {
                 });
             }
 
+            await user.update({
+                last_login_at: new Date()
+            });
+
             return { success: true, user };
 
         } catch (err) {
