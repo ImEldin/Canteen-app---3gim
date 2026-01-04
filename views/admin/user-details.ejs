@@ -96,7 +96,7 @@
                     <div class="info-item">
                         <span class="info-label">Posljednja prijava</span>
                         <span class="info-value">
-                            <%= user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Nikada' %>
+                            <%= user.last_login_at ? new Date(new Date(user.last_login_at).getTime() + 60 * 60 * 1000).toLocaleString() : 'Nikada' %>
                         </span>
                     </div>
 
@@ -143,7 +143,7 @@
                     <div class="info-item">
                         <span class="info-label">Zaključan do</span>
                         <span class="info-value">
-                            <%= user.locked_until ? new Date(user.locked_until).toLocaleString() : 'N/A' %>
+                            <%= user.locked_until ? new Date(new Date(user.locked_until).getTime() + 60 * 60 * 1000).toLocaleString() : 'N/A' %>
                         </span>
                     </div>
 
