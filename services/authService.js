@@ -15,7 +15,7 @@ module.exports = {
             }
 
             if (user.is_locked) {
-                const now = now();
+                const now = new Date();
                 if (user.locked_until && now < user.locked_until) {
                     return { success: false, message: 'Nalog je zaključan. Pokušajte ponovo kasnije.' };
                 } else {
@@ -52,7 +52,7 @@ module.exports = {
                 failed_login_attempts: 0,
                 is_locked: false,
                 locked_until: null,
-                last_login_at: now()
+                last_login_at: new Date()
             });
 
             return { success: true, user };
@@ -110,7 +110,7 @@ module.exports = {
             let user = await userRepository.findByEmail(email);
 
             if (user && user.is_locked) {
-                const now = now();
+                const now = new Date();
                 if (user.locked_until && now < user.locked_until) {
                     return { success: false, message: 'Nalog je zaključan. Pokušajte ponovo kasnije.' };
                 } else {
@@ -131,7 +131,7 @@ module.exports = {
             }
 
             await user.update({
-                last_login_at: now()
+                last_login_at: new Date()
             });
 
             return { success: true, user };

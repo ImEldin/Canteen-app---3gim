@@ -93,6 +93,6 @@ function enableTime() {
     if (breakInput) breakInput.value = "";
 
     const breakSelectText = document.querySelector('#breakSlotSelect .selected-text');
-    if (breakSelectText) breakSelectText.textContent = 'Select break';
+    if (breakSelectText) breakSelectText.textContent = 'Odaberi odmor';
     document.querySelector('#breakSlotOptions .selected')?.classList.remove('selected');
 }

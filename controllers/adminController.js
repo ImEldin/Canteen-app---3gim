@@ -62,6 +62,20 @@ module.exports = {
             const tempPassword = req.session.tempPassword || null;
             delete req.session.tempPassword;
 
+            if (user.locked_until) {
+                const d = new Date(user.locked_until);
+                user.locked_until_display = new Date(
+                    d.getTime() + 60 * 60 * 1000
+                ).toLocaleString();
+            }
+
+            if (user.last_login_at) {
+                const d = new Date(user.last_login_at);
+                user.last_login_at_display = new Date(
+                    d.getTime() + 60 * 60 * 1000
+                ).toLocaleString();
+            }
+
             res.render('admin/user-details', { user, admin , success: successMessage, tempPassword });
 
         } catch (err) {
