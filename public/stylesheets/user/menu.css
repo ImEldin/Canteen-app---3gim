@@ -563,6 +563,16 @@
     }
 
     .back-to-dash span { display: none; }
+
+    #pickup_time {
+        appearance: none;
+        -webkit-appearance: none;
+
+        width: 100% !important;
+        max-width: 100% !important;
+
+        padding-right: 12px;
+    }
 }
 
 @media (max-width: 576px) {
