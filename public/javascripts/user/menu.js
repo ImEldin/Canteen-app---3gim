@@ -3,9 +3,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectEl = document.getElementById(selectId);
         const optionsEl = document.getElementById(optionsId);
         const inputEl = document.getElementById(inputId);
-        const selectedTextEl = selectEl.querySelector('.selected-text');
 
-        if (!selectEl || !optionsEl || !inputEl || !selectedTextEl) return;
+        if (!selectEl || !optionsEl || !inputEl) return;
+
+        const selectedTextEl = selectEl.querySelector('.selected-text');
+        if (!selectedTextEl) return;
 
         document.body.appendChild(optionsEl);
 

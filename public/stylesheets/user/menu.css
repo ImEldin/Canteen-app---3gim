@@ -518,6 +518,11 @@
     .cart-sidebar {
         position: static;
         top: auto;
+        order: -1;
+    }
+
+    .menu-items-grid {
+        order: 1;
     }
 
     .nav-actions {
